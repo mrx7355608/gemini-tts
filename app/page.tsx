@@ -1,14 +1,14 @@
 "use client";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/AuthContext";
-import { PlayCircle, Mic2 } from "lucide-react";
+import { PlayCircle, Mic2, Download } from "lucide-react";
 import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 
 export default function HomePage() {
   useAuth(); // Only to ensure auth context is loaded
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [selectedVoice, setSelectedVoice] = useState("Zephyr");
+  const [selectedVoice, setSelectedVoice] = useState("zephyr");
   const [temperature, setTemperature] = useState(1);
   const [text, setText] = useState("");
   const [audioURL, setAudioURL] = useState("");
@@ -17,23 +17,23 @@ export default function HomePage() {
     "Read aloud in a warm and friendly tone:"
   );
   const [selectedModel, setSelectedModel] = useState(
-    "Gemini 2.5 Flash Preview TTS"
+    "gemini-2.5-flash-preview-tts"
   );
 
   const handleRun = async () => {
     console.log("Prompt: ", text);
-    console.log("Voice: ", selectedVoice.toLowerCase());
+    console.log("Voice: ", selectedVoice);
     console.log("Temperature: ", temperature);
-    console.log("Model: ", selectedModel.toLowerCase().replaceAll(" ", "-"));
+    console.log("Model: ", selectedModel);
     console.log("Style Instructions: ", styleInstructions);
 
     const response = await fetch("/api/generate-audio", {
       method: "POST",
       body: JSON.stringify({
         text,
-        voice: selectedVoice.toLowerCase(),
+        voice: selectedVoice,
         temperature,
-        model: selectedModel.toLowerCase().replaceAll(" ", "-"),
+        model: selectedModel,
         styleInstructions,
       }),
       headers: {
@@ -41,13 +41,8 @@ export default function HomePage() {
       },
     });
 
-    const audioBuffer = await response.blob();
-    const audioUrl = URL.createObjectURL(audioBuffer);
-    setAudioURL(audioUrl);
-    const a = document.createElement("a");
-    a.href = audioUrl;
-    a.download = "tts.wav";
-    a.click();
+    const result = await response.json();
+    setAudioURL(result.url);
   };
 
   return (
@@ -100,11 +95,27 @@ export default function HomePage() {
           {/* Divdier */}
           <div className="h-px bg-gray-200 mt-8"></div>
 
-          {/* Run Button */}
-          <div className="flex justify-end items-center p-6">
-            <audio id="audio" controls autoPlay>
-              <source src={audioURL} type="audio/wav" />
-            </audio>
+          {/* Bottom section */}
+          <div className="flex justify-between items-center p-6">
+            <div className="flex items-center gap-2">
+              {/* Audio player */}
+              <audio controls src={audioURL} />
+
+              {/* Download audio button */}
+              <button
+                className="border-1 border-gray-800  hover:bg-gray-200 cursor-pointer px-6 py-2 rounded-full transition-all"
+                onClick={() => {
+                  const a = document.createElement("a");
+                  a.href = audioURL;
+                  a.download = "tts.wav";
+                  a.click();
+                }}
+              >
+                <Download className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Run button */}
             <button
               onClick={handleRun}
               className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-full shadow transition-all"
@@ -117,7 +128,7 @@ export default function HomePage() {
             </button>
           </div>
         </div>
-        {/* Sidebar */}
+
         <Sidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}

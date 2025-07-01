@@ -92,8 +92,12 @@ export default function Sidebar({
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
             >
-              <option>Gemini 2.5 Pro Preview TTS</option>
-              <option>Gemini 2.5 Flash Preview TTS</option>
+              <option value="gemini-2.5-pro-preview-tts">
+                Gemini 2.5 Pro Preview TTS
+              </option>
+              <option value="gemini-2.5-flash-preview-tts">
+                Gemini 2.5 Flash Preview TTS
+              </option>
             </select>
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
               <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
@@ -142,7 +146,9 @@ export default function Sidebar({
               onChange={(e) => setSelectedVoice(e.target.value)}
             >
               {VOICE_OPTIONS.map((voice) => (
-                <option key={voice.name}>{voice.name}</option>
+                <option key={voice.name} value={voice.name.toLowerCase()}>
+                  {voice.name}
+                </option>
               ))}
             </select>
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
