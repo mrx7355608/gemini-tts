@@ -1,11 +1,10 @@
 "use client";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/AuthContext";
-import { PlayCircle, Mic2, Download } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Mic2, Download, PlayCircle } from "lucide-react";
+import { useState } from "react";
 import Sidebar from "./components/Sidebar";
-import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { toBlobURL } from "@ffmpeg/util";
+import TaskStatus from "./components/TaskStatus";
 
 export default function HomePage() {
   useAuth(); // Only to ensure auth context is loaded
@@ -14,24 +13,22 @@ export default function HomePage() {
   const [temperature, setTemperature] = useState(1);
   const [text, setText] = useState("");
   const [audioURL, setAudioURL] = useState("");
-  const [loaded, setLoaded] = useState(false);
-  const [isClient, setIsClient] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [handleObj, setHandleObj] = useState({
+    publicAccessToken: "",
+    id: "",
+    taskIdentifier: "",
+  });
   const [styleInstructions, setStyleInstructions] = useState(
     "Read aloud in a warm and friendly tone:"
   );
   const [selectedModel, setSelectedModel] = useState(
     "gemini-2.5-flash-preview-tts"
   );
-  const ffmpegRef = useRef<FFmpeg>(new FFmpeg());
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) return null;
 
   const handleRun = async () => {
-    const response = await fetch("/api/test-ffmpeg", {
+    setLoading(true);
+    const response = await fetch("/api/generate-audio", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,9 +42,28 @@ export default function HomePage() {
       }),
     });
 
+    if (!response.ok) {
+      setLoading(false);
+      return;
+    }
+
     const result = await response.json();
     console.log(result);
+    setHandleObj(result);
   };
+
+  function downloadFileFromUrl() {
+    fetch(audioURL)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = "gemini_tts.mp3";
+        a.click();
+        URL.revokeObjectURL(blobUrl);
+      });
+  }
 
   return (
     <ProtectedRoute>
@@ -77,7 +93,6 @@ export default function HomePage() {
                 onChange={(e) => setStyleInstructions(e.target.value)}
                 placeholder="Read aloud in a warm and friendly tone:"
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm focus:border-orange-500 focus:ring-4 focus:ring-orange-100 focus:bg-white outline-none transition-all"
-                defaultValue="Read aloud in a warm and friendly tone:"
               />
             </div>
 
@@ -101,35 +116,47 @@ export default function HomePage() {
 
           {/* Bottom section */}
           <div className="flex justify-between items-center p-6">
-            <div className="flex items-center gap-2">
-              {/* Audio player */}
-              <audio controls src={audioURL} />
+            {audioURL && (
+              <div className="flex items-center gap-2">
+                {/* Audio player */}
+                <audio controls src={audioURL} />
 
-              {/* Download audio button */}
-              <button
-                className="border-1 border-gray-800  hover:bg-gray-200 cursor-pointer px-6 py-2 rounded-full transition-all"
-                onClick={() => {
-                  const a = document.createElement("a");
-                  a.href = audioURL;
-                  a.download = "tts.wav";
-                  a.click();
-                }}
-              >
-                <Download className="w-5 h-5" />
-              </button>
-            </div>
+                {/* Download audio button */}
+                <button
+                  className="border-1 border-gray-800  hover:bg-gray-200 cursor-pointer px-6 py-2 rounded-full transition-all"
+                  onClick={downloadFileFromUrl}
+                >
+                  <Download className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+            {!audioURL && <div></div>}
 
             {/* Run button */}
             <button
               onClick={handleRun}
-              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-full shadow transition-all"
+              disabled={loading}
+              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-full shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-orange-500 cursor-pointer"
             >
               <PlayCircle className="w-5 h-5" />
-              <span className="font-bold mt-1 text-lg">Run</span>
+              <span className="font-bold mt-1 text-lg">
+                {loading ? "Running..." : "Run"}
+              </span>
               <span className="ml-1 text-xs bg-white/20 rounded px-2 py-0.5">
                 Ctrl ↵
               </span>
             </button>
+            {loading && handleObj.publicAccessToken && (
+              <TaskStatus
+                handleObj={handleObj}
+                handleComplete={(url) => {
+                  console.log("url", url);
+                  setLoading(false);
+                  setAudioURL(url || "");
+                }}
+                handleError={console.error}
+              />
+            )}
           </div>
         </div>
 
