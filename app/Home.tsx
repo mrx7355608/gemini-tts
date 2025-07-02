@@ -122,7 +122,7 @@ export default function HomePage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row items-start justify-center p-6 gap-4">
+      <div className="bg-gray-50 flex flex-col lg:flex-row items-start justify-center p-6 gap-4">
         {/* Main Card */}
         <div className="shadow-sm bg-white rounded-xl flex-1 w-full">
           {/* Breadcrumb */}

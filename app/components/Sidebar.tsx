@@ -111,7 +111,7 @@ export default function Sidebar({
             </span>
           </div>
         </div>
-        {/* Model Settings: Temperature slider */}
+        {/* Temperature slider */}
         <div className="mb-4">
           <div className="font-semibold text-gray-700 mb-2">Model Settings</div>
           <label
@@ -126,6 +126,7 @@ export default function Sidebar({
             type="range"
             min={0}
             max={2}
+            step={0.01}
             value={temperature}
             onChange={(e) => setTemperature(Number(e.target.value))}
             className="w-full accent-orange-500 h-2 rounded-lg appearance-none cursor-pointer bg-gray-200"
