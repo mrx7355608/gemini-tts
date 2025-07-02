@@ -31,7 +31,7 @@ export default function HomePage() {
   if (!isClient) return null;
 
   const handleRun = async () => {
-    const response = await fetch("/api/generate-audio", {
+    const response = await fetch("/api/test-ffmpeg", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,53 +46,7 @@ export default function HomePage() {
     });
 
     const result = await response.json();
-    const pcm = result.audio;
-
-    await load();
-
-    await convert(Buffer.from(pcm, "base64"));
-  };
-
-  const convert = async (buffer: Buffer) => {
-    if (!loaded) return;
-
-    const ffmpeg = ffmpegRef.current;
-    await ffmpeg.writeFile("input.pcm", buffer);
-    await ffmpeg.exec([
-      "-f",
-      "s16le", // PCM format (16-bit little endian)
-      "-ar",
-      "24000", // sample rate, adjust if needed
-      "-ac",
-      "1", // number of channels, adjust if needed
-      "-i",
-      "input.pcm",
-      "-acodec",
-      "libmp3lame",
-      "output.mp3",
-    ]);
-    const data = await ffmpeg.readFile("output.mp3");
-    const blob = new Blob([data], { type: "video/mp4" });
-    setAudioURL(URL.createObjectURL(blob));
-  };
-
-  const load = async () => {
-    const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd";
-    const ffmpeg = ffmpegRef.current;
-    ffmpeg.on("log", ({ message }) => {
-      console.log(message);
-    });
-
-    // toBlobURL is used to bypass CORS issue, urls with the same
-    // domain can be used directly.
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(
-        `${baseURL}/ffmpeg-core.wasm`,
-        "application/wasm"
-      ),
-    });
-    setLoaded(true);
+    console.log(result);
   };
 
   return (
