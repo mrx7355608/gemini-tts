@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
-import { supabase } from "../supabaseClient";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "../components/ProtectedRoute";
+
+const supabase = createClient();
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -39,6 +41,11 @@ export default function LoginPage() {
           </p>
 
           <form onSubmit={handleLogin} className="space-y-6">
+            {error && (
+              <div className="text-red-500 text-sm p-3 bg-red-50 border border-red-200 rounded-lg">
+                {error}
+              </div>
+            )}
             <div>
               <label
                 htmlFor="email"
@@ -74,12 +81,6 @@ export default function LoginPage() {
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm transition-all duration-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 focus:bg-white outline-none"
               />
             </div>
-
-            {error && (
-              <div className="text-red-500 text-sm p-3 bg-red-50 border border-red-200 rounded-lg">
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"

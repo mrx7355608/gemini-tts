@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { User } from "lucide-react";
+import Link from "next/link";
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
@@ -32,7 +33,7 @@ export default function Navbar() {
       </div>
       <div className="relative" ref={menuRef}>
         <button
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-orange-100 transition-colors focus:outline-none"
+          className="cursor-pointer flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-orange-100 transition-colors focus:outline-none"
           onClick={() => setMenuOpen((v) => !v)}
         >
           <User className="w-6 h-6 text-gray-700" />
@@ -40,10 +41,18 @@ export default function Navbar() {
         {menuOpen && (
           <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg py-2 z-40 animate-fade-in">
             <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100 truncate">
-              {user?.email || "User"}
+              {user?.user_metadata.full_name || "User"}
+            </div>
+            <div className="hover:bg-gray-100 py-2 cursor-pointer w-full border-b border-gray-200">
+              <Link
+                href="/history"
+                className="text-left px-4 py-2 text-sm text-gray-700 "
+              >
+                History
+              </Link>
             </div>
             <button
-              className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+              className="cursor-pointer w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-orange-50 hover:text-orange-600 transition-colors"
               onClick={signOut}
             >
               Log out

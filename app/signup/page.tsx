@@ -1,10 +1,13 @@
 "use client";
 import { useState } from "react";
-import { supabase } from "../../lib/supabaseClient";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "../components/ProtectedRoute";
 
+const supabase = createClient();
+
 export default function SignupPage() {
+  const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,11 +18,32 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const { error } = await supabase.auth.signUp({
+
+    // Signup user
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: fullname,
+        },
+      },
     });
+
+    // Create user profile
+    const { error: error2 } = await supabase.from("user_profile").insert([
+      {
+        id: data.user?.id,
+        full_name: fullname,
+        email: email,
+      },
+    ]);
+    if (error2) {
+      setError(error2.message);
+    }
+
     setLoading(false);
+
     if (error) {
       setError(error.message);
     } else {
@@ -39,6 +63,24 @@ export default function SignupPage() {
           </p>
 
           <form onSubmit={handleSignup} className="space-y-6">
+            <div>
+              <label
+                htmlFor="fullname"
+                className="block text-gray-700 font-medium mb-2 text-sm"
+              >
+                Full Name
+              </label>
+              <input
+                id="fullname"
+                type="text"
+                placeholder="Enter your full name"
+                value={fullname}
+                onChange={(e) => setFullname(e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm transition-all duration-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 focus:bg-white outline-none"
+              />
+            </div>
+
             <div>
               <label
                 htmlFor="email"

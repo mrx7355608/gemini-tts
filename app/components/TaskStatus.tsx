@@ -21,7 +21,6 @@ export default function TaskStatus({
 
   useEffect(() => {
     if (run?.status === "COMPLETED") {
-      console.log("completed run", run);
       handleComplete(run.output?.url);
     }
   }, [run?.status]);

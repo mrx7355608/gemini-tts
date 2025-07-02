@@ -6,6 +6,8 @@ import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import TaskStatus from "./components/TaskStatus";
 import { validateInputs } from "@/lib/validateInputs";
+import { createClient } from "@/lib/supabase/client";
+import { IHistoryData } from "@/lib/types";
 
 export default function HomePage() {
   useAuth();
@@ -34,8 +36,14 @@ export default function HomePage() {
         return;
       }
 
+      setAudioURL("");
       setError("");
       setLoading(true);
+      setHandleObj({
+        publicAccessToken: "",
+        id: "",
+        taskIdentifier: "",
+      });
 
       // Validate inputs
       const validationError = validateInputs(
@@ -98,6 +106,19 @@ export default function HomePage() {
         URL.revokeObjectURL(blobUrl);
       });
   }
+
+  const onComplete = async (url: string | undefined) => {
+    setLoading(false);
+    setAudioURL(url || "");
+    await addHistory({
+      prompt: text,
+      style_instruction: styleInstructions,
+      voice: selectedVoice,
+      tts_model: selectedModel,
+      temperature: temperature,
+      audio_clip: url || "",
+    });
+  };
 
   return (
     <ProtectedRoute>
@@ -197,11 +218,7 @@ export default function HomePage() {
             {loading && handleObj.publicAccessToken && (
               <TaskStatus
                 handleObj={handleObj}
-                handleComplete={(url) => {
-                  console.log("url", url);
-                  setLoading(false);
-                  setAudioURL(url || "");
-                }}
+                handleComplete={onComplete}
                 handleError={console.error}
               />
             )}
@@ -220,4 +237,25 @@ export default function HomePage() {
       </div>
     </ProtectedRoute>
   );
+
+  async function addHistory(history: IHistoryData) {
+    const supabase = createClient();
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) {
+      console.error("No user found");
+      return;
+    }
+
+    const { error } = await supabase.from("history").insert({
+      user_id: data.user.id,
+      ...history,
+    });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    return;
+  }
 }

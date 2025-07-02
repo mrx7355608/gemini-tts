@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(handler, { status: 200 });
   } catch (err: unknown) {
+    console.error(err);
     return NextResponse.json(
       { error: "Error generating audio" },
       { status: 500 }
