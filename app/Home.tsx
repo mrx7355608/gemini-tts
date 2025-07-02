@@ -1,14 +1,14 @@
 "use client";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/AuthContext";
-import { Mic2, Download, PlayCircle } from "lucide-react";
+import { Mic2, Download, PlayCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import TaskStatus from "./components/TaskStatus";
+import { validateInputs } from "@/lib/validateInputs";
 
 export default function HomePage() {
-  useAuth(); // Only to ensure auth context is loaded
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  useAuth();
   const [selectedVoice, setSelectedVoice] = useState("zephyr");
   const [temperature, setTemperature] = useState(1);
   const [text, setText] = useState("");
@@ -25,31 +25,65 @@ export default function HomePage() {
   const [selectedModel, setSelectedModel] = useState(
     "gemini-2.5-flash-preview-tts"
   );
+  const [error, setError] = useState("");
 
   const handleRun = async () => {
-    setLoading(true);
-    const response = await fetch("/api/generate-audio", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        text: text,
-        styleInstructions: styleInstructions,
-        model: selectedModel,
-        voice: selectedVoice,
-        temperature: temperature,
-      }),
-    });
+    try {
+      // If already running, return
+      if (loading) {
+        return;
+      }
 
-    if (!response.ok) {
+      setError("");
+      setLoading(true);
+
+      // Validate inputs
+      const validationError = validateInputs(
+        text,
+        selectedModel,
+        selectedVoice,
+        temperature,
+        styleInstructions
+      );
+
+      if (validationError) {
+        setLoading(false);
+        setError(validationError);
+        setTimeout(() => setError(""), 5000);
+        return;
+      }
+
+      // Make API call
+      const response = await fetch("/api/generate-audio", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: text,
+          styleInstructions: styleInstructions,
+          model: selectedModel,
+          voice: selectedVoice,
+          temperature: temperature,
+        }),
+      });
+
+      if (!response.ok) {
+        setLoading(false);
+        setError("Error generating audio");
+        console.error(await response.json());
+        setTimeout(() => setError(""), 5000);
+        return;
+      }
+
+      const result = await response.json();
+      setHandleObj(result);
+    } catch (err) {
+      setError("Internal server error");
+      console.error(err);
       setLoading(false);
-      return;
+      setTimeout(() => setError(""), 5000);
     }
-
-    const result = await response.json();
-    console.log(result);
-    setHandleObj(result);
   };
 
   function downloadFileFromUrl() {
@@ -80,6 +114,13 @@ export default function HomePage() {
 
           {/* Divdier */}
           <div className="h-px bg-gray-200 mb-8"></div>
+
+          {/* Error Message */}
+          {error && (
+            <p className="bg-red-50 rounded-lg mx-6 font-medium p-4 text-red-600">
+              {error}
+            </p>
+          )}
 
           {/* Style instructions */}
           <div className="flex m-6 flex-col gap-6 bg-gray-50 rounded-xl p-7 border border-gray-200">
@@ -119,7 +160,9 @@ export default function HomePage() {
             {audioURL && (
               <div className="flex items-center gap-2">
                 {/* Audio player */}
-                <audio controls src={audioURL} />
+                <audio className="bg-blue-800 rounded-lg" controls autoPlay>
+                  <source src={audioURL} type="audio/mpeg" />
+                </audio>
 
                 {/* Download audio button */}
                 <button
@@ -130,22 +173,27 @@ export default function HomePage() {
                 </button>
               </div>
             )}
+
+            {/* An empty div to prevent layout shift */}
             {!audioURL && <div></div>}
 
             {/* Run button */}
             <button
               onClick={handleRun}
               disabled={loading}
-              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-full shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-orange-500 cursor-pointer"
+              className="px-7 flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-full shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-orange-500 cursor-pointer"
             >
-              <PlayCircle className="w-5 h-5" />
-              <span className="font-bold mt-1 text-lg">
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <PlayCircle className="w-5 h-5" />
+              )}
+              <span className="font-bold text-lg mr-2">
                 {loading ? "Running..." : "Run"}
               </span>
-              <span className="ml-1 text-xs bg-white/20 rounded px-2 py-0.5">
-                Ctrl ↵
-              </span>
             </button>
+
+            {/* Subscribes to task status and updates audio URL on task completion */}
             {loading && handleObj.publicAccessToken && (
               <TaskStatus
                 handleObj={handleObj}
@@ -160,9 +208,8 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Sidebar */}
         <Sidebar
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
           selectedVoice={selectedVoice}

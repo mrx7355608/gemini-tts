@@ -1,5 +1,6 @@
 "use client";
 import { X, ChevronLeft } from "lucide-react";
+import { useState } from "react";
 
 const VOICE_OPTIONS = [
   { name: "Zephyr", desc: "Bright" },
@@ -35,8 +36,6 @@ const VOICE_OPTIONS = [
 ];
 
 interface SidebarProps {
-  sidebarOpen: boolean;
-  setSidebarOpen: (open: boolean) => void;
   selectedModel: string;
   setSelectedModel: (model: string) => void;
   selectedVoice: string;
@@ -46,8 +45,6 @@ interface SidebarProps {
 }
 
 export default function Sidebar({
-  sidebarOpen,
-  setSidebarOpen,
   selectedModel,
   setSelectedModel,
   selectedVoice,
@@ -55,6 +52,8 @@ export default function Sidebar({
   temperature,
   setTemperature,
 }: SidebarProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
     <div
       className={`relative flex-shrink-0 mt-8 lg:mt-0 transition-all duration-300 ease-in-out ${
