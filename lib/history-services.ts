@@ -2,9 +2,9 @@
 
 import { createClient } from "./supabase/server";
 
-const supabase = await createClient();
 
 export async function getHistory() {
+  const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   if (!data.user) {
     console.error("No user found");

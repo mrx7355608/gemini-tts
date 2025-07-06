@@ -13,16 +13,38 @@ const supabase = createClient(
 
 export const convertPcmToMp3 = task({
   id: "convert-pcm-to-mp3",
-  run: async (payload: { pcm: string }) => {
-    const { pcm } = payload;
+  run: async (payload: { audioUrl: (string | undefined)[] }) => {
+    const { audioUrl } = payload;
+
+    if (audioUrl.length === 0) {
+      return { message: "No audio URLs provided" };
+    }
+
+
+    const filteredUrls = audioUrl.filter((path) => path !== undefined);
+    const downloadPromises = filteredUrls.map((path) => {
+      return supabase.storage
+        .from("audio-files")
+        .download(path);
+    });
+
+    const downloadResponses = await Promise.all(downloadPromises);
+    const pcmBuffers: Buffer[] = [];
+
+    for (const response of downloadResponses) {
+      const data = await response.data?.arrayBuffer();
+      pcmBuffers.push(Buffer.from(data!));
+    }
+
+    const mainBuffer = Buffer.concat(pcmBuffers);
 
     logger.info("Converting....");
     const tempDirectory = os.tmpdir();
-    const filename = `output_${Date.now()}.mp3`;
+    const filename = `output_${Date.now()}.mp3`; 
     const outputPath = path.join(tempDirectory, filename);
 
     await new Promise((resolve, reject) => {
-      const inputStream = Readable.from(Buffer.from(pcm, "base64"));
+      const inputStream = Readable.from([mainBuffer]);
 
       ffmpeg(inputStream)
         .inputOptions([

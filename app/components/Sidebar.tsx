@@ -3,36 +3,36 @@ import { X, ChevronLeft } from "lucide-react";
 import { useState } from "react";
 
 const VOICE_OPTIONS = [
-  { name: "Zephyr", desc: "Bright" },
-  { name: "Puck", desc: "Upbeat" },
-  { name: "Charon", desc: "Informative" },
-  { name: "Kore", desc: "Firm" },
-  { name: "Fenrir", desc: "Excitable" },
-  { name: "Leda", desc: "Youthful" },
-  { name: "Orus", desc: "Firm" },
-  { name: "Aoede", desc: "Breezy" },
-  { name: "Callirrhoe", desc: "Easy-going" },
-  { name: "Autonoe", desc: "Bright" },
-  { name: "Enceladus", desc: "Breathy" },
-  { name: "Iapetus", desc: "Clear" },
-  { name: "Umbriel", desc: "Easy-going" },
-  { name: "Algieba", desc: "Smooth" },
-  { name: "Despina", desc: "Smooth" },
-  { name: "Erinome", desc: "Clear" },
-  { name: "Algenib", desc: "Gravelly" },
-  { name: "Rasalgethi", desc: "Informative" },
-  { name: "Laomedeia", desc: "Upbeat" },
-  { name: "Achernar", desc: "Soft" },
-  { name: "Alnilam", desc: "Firm" },
-  { name: "Schedar", desc: "Even" },
-  { name: "Gacrux", desc: "Mature" },
-  { name: "Pulcherrima", desc: "Forward" },
-  { name: "Achird", desc: "Friendly" },
-  { name: "Zubenelgenubi", desc: "Casual" },
-  { name: "Vindemiatrix", desc: "Gentle" },
-  { name: "Sadachbia", desc: "Lively" },
-  { name: "Sadaltager", desc: "Knowledgeable" },
-  { name: "Sulafat", desc: "Warm" },
+  { name: "Zephyr", desc: "Bright", gender: "female" },
+  { name: "Puck", desc: "Upbeat", gender: "male" },
+  { name: "Charon", desc: "Informative", gender: "male" },
+  { name: "Kore", desc: "Firm", gender: "female" },
+  { name: "Fenrir", desc: "Excitable", gender: "male" },
+  { name: "Leda", desc: "Youthful", gender: "female" },
+  { name: "Orus", desc: "Firm", gender: "male" },
+  { name: "Aoede", desc: "Breezy", gender: "female" },
+  { name: "Callirrhoe", desc: "Easy-going", gender: "female" },
+  { name: "Autonoe", desc: "Bright", gender: "female" },
+  { name: "Enceladus", desc: "Breathy", gender: "male" },
+  { name: "Iapetus", desc: "Clear", gender: "male" },
+  { name: "Umbriel", desc: "Easy-going", gender: "male" },
+  { name: "Algieba", desc: "Smooth", gender: "male" },
+  { name: "Despina", desc: "Smooth", gender: "female" },
+  { name: "Erinome", desc: "Clear", gender: "female" },
+  { name: "Algenib", desc: "Gravelly", gender: "male" },
+  { name: "Rasalgethi", desc: "Informative", gender: "male" },
+  { name: "Laomedeia", desc: "Upbeat", gender: "female" },
+  { name: "Achernar", desc: "Soft", gender: "female" },
+  { name: "Alnilam", desc: "Firm", gender: "male" },
+  { name: "Schedar", desc: "Even", gender: "male" },
+  { name: "Gacrux", desc: "Mature", gender: "female" },
+  { name: "Pulcherrima", desc: "Forward", gender: "female" },
+  { name: "Achird", desc: "Friendly", gender: "male" },
+  { name: "Zubenelgenubi", desc: "Casual", gender: "male" },
+  { name: "Vindemiatrix", desc: "Gentle", gender: "female" },
+  { name: "Sadachbia", desc: "Lively", gender: "male" },
+  { name: "Sadaltager", desc: "Knowledgeable", gender: "male" },
+  { name: "Sulafat", desc: "Warm", gender: "female" },
 ];
 
 interface SidebarProps {
@@ -53,6 +53,13 @@ export default function Sidebar({
   setTemperature,
 }: SidebarProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [genderFilter, setGenderFilter] = useState<string>("all");
+
+  // Filter voices based on gender selection
+  const filteredVoices = VOICE_OPTIONS.filter((voice) => {
+    if (genderFilter === "all") return true;
+    return voice.gender === genderFilter;
+  });
 
   return (
     <div
@@ -136,6 +143,45 @@ export default function Sidebar({
             <span>2</span>
           </div>
         </div>
+        {/* Gender filter radio buttons */}
+        <div className="mb-4">
+          <label className="block text-gray-600 text-sm mb-2">Voice Gender</label>
+          <div className="space-y-2">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="genderFilter"
+                value="all"
+                checked={genderFilter === "all"}
+                onChange={(e) => setGenderFilter(e.target.value)}
+                className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 focus:ring-2"
+              />
+              <span className="ml-2 text-sm text-gray-700">All Voices</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="genderFilter"
+                value="male"
+                checked={genderFilter === "male"}
+                onChange={(e) => setGenderFilter(e.target.value)}
+                className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 focus:ring-2"
+              />
+              <span className="ml-2 text-sm text-gray-700">Male Voices</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="genderFilter"
+                value="female"
+                checked={genderFilter === "female"}
+                onChange={(e) => setGenderFilter(e.target.value)}
+                className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 focus:ring-2"
+              />
+              <span className="ml-2 text-sm text-gray-700">Female Voices</span>
+            </label>
+          </div>
+        </div>
         {/* Voice dropdown */}
         <div className="mb-4">
           <label className="block text-gray-600 text-sm mb-1">Voice</label>
@@ -145,7 +191,7 @@ export default function Sidebar({
               value={selectedVoice}
               onChange={(e) => setSelectedVoice(e.target.value)}
             >
-              {VOICE_OPTIONS.map((voice) => (
+              {filteredVoices.map((voice) => (
                 <option key={voice.name} value={voice.name.toLowerCase()}>
                   {voice.name}
                 </option>
