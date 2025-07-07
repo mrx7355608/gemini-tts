@@ -31,9 +31,9 @@ export default function LoginPage() {
 
   return (
     <ProtectedRoute requireAuth={false}>
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-white p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-white p-4">
         <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-xl w-full max-w-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-          <h1 className="text-3xl font-bold text-orange-500 text-center mb-2 tracking-tight">
+          <h1 className="text-3xl font-bold text-green-500 text-center mb-2 tracking-tight">
             Welcome Back
           </h1>
           <p className="text-gray-500 text-center mb-8 text-sm">
@@ -60,7 +60,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm transition-all duration-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 focus:bg-white outline-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm transition-all duration-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white outline-none"
               />
             </div>
 
@@ -78,14 +78,14 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm transition-all duration-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 focus:bg-white outline-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm transition-all duration-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white outline-none"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+              className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
             >
               {loading ? (
                 <>
@@ -121,7 +121,7 @@ export default function LoginPage() {
             Don&apos;t have an account?{" "}
             <a
               href="/signup"
-              className="text-orange-500 font-medium hover:text-orange-600 hover:underline transition-colors"
+              className="text-green-500 font-medium hover:text-green-600 hover:underline transition-colors"
             >
               Create one
             </a>

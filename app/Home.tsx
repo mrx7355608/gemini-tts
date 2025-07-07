@@ -154,7 +154,7 @@ export default function HomePage() {
                 value={styleInstructions}
                 onChange={(e) => setStyleInstructions(e.target.value)}
                 placeholder="Read aloud in a warm and friendly tone:"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm focus:border-orange-500 focus:ring-4 focus:ring-orange-100 focus:bg-white outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white outline-none transition-all"
               />
             </div>
 
@@ -165,7 +165,7 @@ export default function HomePage() {
               </label>
               <textarea
                 placeholder="Start writing or paste text here to generate speech"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm focus:border-orange-500 focus:ring-4 focus:ring-orange-100 focus:bg-white outline-none transition-all resize-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white outline-none transition-all resize-none"
                 rows={5}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -202,7 +202,7 @@ export default function HomePage() {
             <button
               onClick={handleRun}
               disabled={loading}
-              className="px-7 flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-full shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-orange-500 cursor-pointer"
+              className="px-7 flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded-full shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-500 cursor-pointer"
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

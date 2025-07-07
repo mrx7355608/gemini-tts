@@ -28,12 +28,12 @@ export default function Navbar() {
 
   return (
     <nav className="w-full bg-white border-b border-gray-100 shadow-sm px-6 py-3 flex items-center justify-between sticky top-0 z-30">
-      <div className="text-xl font-bold text-orange-500 tracking-tight select-none">
+      <div className="text-xl font-bold text-green-500 tracking-tight select-none">
         Gemini TTS
       </div>
       <div className="relative" ref={menuRef}>
         <button
-          className="cursor-pointer flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-orange-100 transition-colors focus:outline-none"
+          className="cursor-pointer flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-green-100 transition-colors focus:outline-none"
           onClick={() => setMenuOpen((v) => !v)}
         >
           <User className="w-6 h-6 text-gray-700" />
@@ -52,7 +52,7 @@ export default function Navbar() {
               </Link>
             </div>
             <button
-              className="cursor-pointer w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+              className="cursor-pointer w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-green-50 hover:text-green-600 transition-colors"
               onClick={signOut}
             >
               Log out

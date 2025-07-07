@@ -94,7 +94,7 @@ export default function Sidebar({
           <label className="block text-gray-600 text-sm mb-1">Model</label>
           <div className="relative">
             <select
-              className="appearance-none w-full px-4 py-2 pr-10 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-all shadow-sm hover:bg-gray-100 focus:bg-white"
+              className="appearance-none w-full px-4 py-2 pr-10 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all shadow-sm hover:bg-gray-100 focus:bg-white"
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
             >
@@ -126,7 +126,7 @@ export default function Sidebar({
             className="block text-gray-600 text-sm mb-1"
           >
             Temperature:{" "}
-            <span className="font-semibold text-orange-600">{temperature}</span>
+            <span className="font-semibold text-green-600">{temperature}</span>
           </label>
           <input
             id="temperature"
@@ -136,7 +136,7 @@ export default function Sidebar({
             step={0.01}
             value={temperature}
             onChange={(e) => setTemperature(Number(e.target.value))}
-            className="w-full accent-orange-500 h-2 rounded-lg appearance-none cursor-pointer bg-gray-200"
+            className="w-full accent-green-500 h-2 rounded-lg appearance-none cursor-pointer bg-gray-200"
           />
           <div className="flex justify-between text-xs text-gray-400 mt-1">
             <span>0</span>
@@ -154,7 +154,7 @@ export default function Sidebar({
                 value="all"
                 checked={genderFilter === "all"}
                 onChange={(e) => setGenderFilter(e.target.value)}
-                className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 focus:ring-2"
+                className="w-4 h-4 text-green-500 border-gray-300 focus:ring-green-500 focus:ring-2"
               />
               <span className="ml-2 text-sm text-gray-700">All Voices</span>
             </label>
@@ -165,7 +165,7 @@ export default function Sidebar({
                 value="male"
                 checked={genderFilter === "male"}
                 onChange={(e) => setGenderFilter(e.target.value)}
-                className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 focus:ring-2"
+                className="w-4 h-4 text-green-500 border-gray-300 focus:ring-green-500 focus:ring-2"
               />
               <span className="ml-2 text-sm text-gray-700">Male Voices</span>
             </label>
@@ -176,7 +176,7 @@ export default function Sidebar({
                 value="female"
                 checked={genderFilter === "female"}
                 onChange={(e) => setGenderFilter(e.target.value)}
-                className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 focus:ring-2"
+                className="w-4 h-4 text-green-500 border-gray-300 focus:ring-green-500 focus:ring-2"
               />
               <span className="ml-2 text-sm text-gray-700">Female Voices</span>
             </label>
@@ -187,7 +187,7 @@ export default function Sidebar({
           <label className="block text-gray-600 text-sm mb-1">Voice</label>
           <div className="relative">
             <select
-              className="appearance-none w-full px-4 py-2 pr-10 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-all shadow-sm hover:bg-gray-100 focus:bg-white"
+              className="appearance-none w-full px-4 py-2 pr-10 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all shadow-sm hover:bg-gray-100 focus:bg-white"
               value={selectedVoice}
               onChange={(e) => setSelectedVoice(e.target.value)}
             >
@@ -214,7 +214,7 @@ export default function Sidebar({
       {/* Floating expand button when sidebar is closed */}
       {!sidebarOpen && (
         <button
-          className="fixed bottom-8 right-8 z-40 bg-white border border-gray-200 rounded-full shadow p-2 hover:bg-orange-50 transition-colors lg:flex hidden"
+          className="fixed bottom-8 right-8 z-40 bg-white border border-gray-200 rounded-full shadow p-2 hover:bg-green-50 transition-colors lg:flex hidden"
           onClick={() => setSidebarOpen(true)}
           aria-label="Expand sidebar"
           type="button"

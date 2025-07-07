@@ -38,11 +38,11 @@ export default function ProtectedRoute({
   // Show loading spinner while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-white">
         <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-xl">
           <div className="flex items-center justify-center">
             <svg
-              className="animate-spin h-8 w-8 text-orange-500"
+              className="animate-spin h-8 w-8 text-green-500"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"

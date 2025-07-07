@@ -77,7 +77,7 @@ export default function HistoryTable({
               <div className="flex items-center">
                 <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
                   <div
-                    className="bg-orange-500 h-2 rounded-full"
+                    className="bg-green-500 h-2 rounded-full"
                     style={{
                       width: `${(item.temperature / 2) * 100}%`,
                     }}
@@ -97,7 +97,7 @@ export default function HistoryTable({
                         const audio = new Audio(item.audio_clip);
                         audio.play();
                       }}
-                      className="cursor-pointer inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+                      className="cursor-pointer inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
                     >
                       <Play className="w-3 h-3 mr-1" />
                       Play
@@ -106,7 +106,7 @@ export default function HistoryTable({
                       onClick={() => {
                         downloadFileFromUrl(item.audio_clip, `${item.id}.mp3`);
                       }}
-                      className="cursor-pointer inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+                      className="cursor-pointer inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
                     >
                       <Download className="w-3 h-3 mr-1" />
                       Download
