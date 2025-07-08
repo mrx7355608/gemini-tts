@@ -165,8 +165,8 @@ export default function HomePage() {
               </label>
               <textarea
                 placeholder="Start writing or paste text here to generate speech"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white outline-none transition-all resize-none"
-                rows={5}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white outline-none transition-all"
+                rows={15}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
               />

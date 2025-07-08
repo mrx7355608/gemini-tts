@@ -5,6 +5,7 @@ import type { convertPcmToMp3 } from "@/app/trigger/convert-pcm-to-mp3";
 import { splitPrompt } from "@/lib/split-prompt";
 import wav from "wav";
 import { createClient } from "@/lib/supabase/server"
+import { randomUUID } from "crypto";
 
 
 export async function POST(req: NextRequest) {
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
     const uploadPromises = buffers.map((buffer) => {
       return supabase.storage
         .from("audio-files")
-        .upload(`${Date.now()}.pcm`, buffer, {
+        .upload(`${randomUUID()}.pcm`, buffer, {
           contentType: "audio/pcm",
         });
     });

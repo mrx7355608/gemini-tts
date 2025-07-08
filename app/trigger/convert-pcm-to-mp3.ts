@@ -5,6 +5,7 @@ import path from "path";
 import os from "os";
 import fs from "fs/promises";
 import { createClient } from "@supabase/supabase-js";
+import { randomUUID } from "crypto";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -16,31 +17,35 @@ export const convertPcmToMp3 = task({
   run: async (payload: { audioUrl: (string | undefined)[] }) => {
     const { audioUrl } = payload;
 
-    if (audioUrl.length === 0) {
+    // Download pcm files from supabase
+    const filteredUrls = audioUrl.filter((path) => path !== undefined);
+    logger.log(`Total audio files to download: ${filteredUrls.length}`);
+
+    if (filteredUrls.length === 0) {
       return { message: "No audio URLs provided" };
     }
 
-
-    const filteredUrls = audioUrl.filter((path) => path !== undefined);
+    logger.log(`Downloading ${filteredUrls.length} audio files...`);
     const downloadPromises = filteredUrls.map((path) => {
       return supabase.storage
         .from("audio-files")
         .download(path);
     });
-
     const downloadResponses = await Promise.all(downloadPromises);
+    logger.log(`Total audio files downloaded: ${downloadResponses.length}`);
+    
+    // Convert pcm files blob to buffers
     const pcmBuffers: Buffer[] = [];
-
     for (const response of downloadResponses) {
       const data = await response.data?.arrayBuffer();
       pcmBuffers.push(Buffer.from(data!));
     }
-
-    const mainBuffer = Buffer.concat(pcmBuffers);
+    logger.log(`Total PCM buffers: ${pcmBuffers.length}`);
 
     logger.info("Converting....");
+    const mainBuffer = Buffer.concat(pcmBuffers);
     const tempDirectory = os.tmpdir();
-    const filename = `output_${Date.now()}.mp3`; 
+    const filename = `output_${randomUUID()}.mp3`;
     const outputPath = path.join(tempDirectory, filename);
 
     await new Promise((resolve, reject) => {
@@ -72,7 +77,7 @@ export const convertPcmToMp3 = task({
     logger.log(`Converted to mp3`);
     const mp3File = await fs.readFile(outputPath);
 
-    // Save to supabase
+    // Save converted mp3 file to supabase
     logger.log("Saving to supabase...");
     const { error } = await supabase.storage
       .from("audio-files")
@@ -81,11 +86,19 @@ export const convertPcmToMp3 = task({
       });
 
     if (error) throw new Error("Supabase upload failed: " + error.message);
-    logger.log("Uploaded to supabase successully");
+    logger.log("Uploaded mp3 to supabase successully");
 
-    // Delete the temporary compressed video file
+    // Delete the temporary audio file
     await fs.unlink(outputPath);
     logger.log("Deleted temporary file");
+
+    // Delete the pcm files
+    console.log("Deleting pcm files...");
+    await supabase.storage
+      .from("audio-files")
+      .remove(filteredUrls);
+
+    logger.log("Deleted pcm files");
 
     // Get the public url
     const publicUrl = supabase.storage
