@@ -170,6 +170,15 @@ export default function HomePage() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
               />
+              <div className="flex justify-end mt-2">
+                <span
+                  className={`text-sm ${
+                    text.length > 30000 ? "text-red-500" : "text-gray-500"
+                  }`}
+                >
+                  {text.length}/30,000 characters
+                </span>
+              </div>
             </div>
           </div>
 

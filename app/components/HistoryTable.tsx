@@ -1,14 +1,51 @@
 "use client";
 
 import { HistoryItem } from "@/lib/types";
-import { Play, Download } from "lucide-react";
+import { Play, Download, Loader2, StopCircle } from "lucide-react";
+import { useState } from "react";
 
 export default function HistoryTable({
   historyData,
 }: {
   historyData: HistoryItem[];
 }) {
-  const downloadFileFromUrl = (audioURL: string, filename: string) => {
+  const [downloadingIds, setDownloadingIds] = useState<string[]>([]);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
+  const playAudio = (id: string, audioClip: string) => {
+    if (playingId === id && audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      setPlayingId(null);
+      setAudio(null);
+      return;
+    }
+
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      setPlayingId(null);
+      setAudio(null);
+    }
+
+    setPlayingId(id);
+    const newAudioClip = new Audio(audioClip);
+    newAudioClip.play();
+    setAudio(newAudioClip);
+
+    newAudioClip.onended = () => {
+      setPlayingId(null);
+      setAudio(null);
+    };
+  };
+
+  const downloadFileFromUrl = (
+    audioURL: string,
+    filename: string,
+    id: string
+  ) => {
+    setDownloadingIds((prev) => [...prev, id]);
     fetch(audioURL)
       .then((res) => res.blob())
       .then((blob) => {
@@ -18,6 +55,7 @@ export default function HistoryTable({
         a.download = filename;
         a.click();
         URL.revokeObjectURL(blobUrl);
+        setDownloadingIds((prev) => prev.filter((id) => id !== id));
       });
   };
 
@@ -93,23 +131,47 @@ export default function HistoryTable({
                 {item.audio_clip && (
                   <>
                     <button
-                      onClick={() => {
-                        const audio = new Audio(item.audio_clip);
-                        audio.play();
-                      }}
+                      onClick={() => playAudio(item.id, item.audio_clip)}
                       className="cursor-pointer inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
                     >
-                      <Play className="w-3 h-3 mr-1" />
-                      Play
+                      {playingId === item.id ? (
+                        <>
+                          <StopCircle className="w-3 h-3 mr-1" />
+                          Stop
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-3 h-3 mr-1" />
+                          Play
+                        </>
+                      )}
                     </button>
                     <button
                       onClick={() => {
-                        downloadFileFromUrl(item.audio_clip, `${item.id}.mp3`);
+                        downloadFileFromUrl(
+                          item.audio_clip,
+                          `${item.id}.mp3`,
+                          item.id
+                        );
                       }}
-                      className="cursor-pointer inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                      className={`cursor-pointer inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors ${
+                        downloadingIds.includes(item.id)
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                      disabled={downloadingIds.includes(item.id)}
                     >
-                      <Download className="w-3 h-3 mr-1" />
-                      Download
+                      {downloadingIds.includes(item.id) ? (
+                        <>
+                          <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                          Downloading...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-3 h-3 mr-1" />
+                          Download
+                        </>
+                      )}
                     </button>
                   </>
                 )}
