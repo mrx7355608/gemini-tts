@@ -1,7 +1,13 @@
 "use client";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/AuthContext";
-import { Mic2, Download, PlayCircle, Loader2 } from "lucide-react";
+import {
+  Mic2,
+  Download,
+  PlayCircle,
+  Loader2,
+  AlertTriangle,
+} from "lucide-react";
 import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import TaskStatus from "./components/TaskStatus";
@@ -170,12 +176,21 @@ export default function HomePage() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
               />
-              <div className="flex justify-end mt-2">
-                <span
-                  className={`text-sm ${
-                    text.length > 30000 ? "text-red-500" : "text-gray-500"
-                  }`}
-                >
+              <div className="flex justify-between mt-2">
+                {text.length > 30000 ? (
+                  <span className="text-sm text-red-500 font-medium">
+                    <AlertTriangle className="inline w-4 h-4 mr-2 text-red-500" />
+                    You are generating 30+ minutes of audio.
+                  </span>
+                ) : text.length > 20000 ? (
+                  <span className="text-sm text-yellow-600 font-medium">
+                    <AlertTriangle className="inline w-4 h-4 mr-1" />
+                    You are generating 20+ minutes of audio.
+                  </span>
+                ) : (
+                  <div></div>
+                )}
+                <span className="text-sm text-gray-500">
                   {text.length}/30,000 characters
                 </span>
               </div>
