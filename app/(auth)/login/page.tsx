@@ -2,52 +2,30 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import ProtectedRoute from "../components/ProtectedRoute";
+import ProtectedRoute from "../../components/ProtectedRoute";
 
 const supabase = createClient();
 
-export default function SignupPage() {
-  const [fullname, setFullname] = useState("");
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
-    // Signup user
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
-      options: {
-        data: {
-          full_name: fullname,
-        },
-      },
     });
-
-    // Create user profile
-    const { error: error2 } = await supabase.from("user_profile").insert([
-      {
-        id: data.user?.id,
-        full_name: fullname,
-        email: email,
-      },
-    ]);
-    if (error2) {
-      setError(error2.message);
-    }
-
     setLoading(false);
-
     if (error) {
       setError(error.message);
     } else {
-      router.push("/login");
+      router.push("/");
     }
   };
 
@@ -56,31 +34,18 @@ export default function SignupPage() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-white p-4">
         <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-xl w-full max-w-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
           <h1 className="text-3xl font-bold text-green-500 text-center mb-2 tracking-tight">
-            Create Account
+            Welcome Back
           </h1>
           <p className="text-gray-500 text-center mb-8 text-sm">
-            Join us and start your journey today
+            Sign in to your account to continue
           </p>
 
-          <form onSubmit={handleSignup} className="space-y-6">
-            <div>
-              <label
-                htmlFor="fullname"
-                className="block text-gray-700 font-medium mb-2 text-sm"
-              >
-                Full Name
-              </label>
-              <input
-                id="fullname"
-                type="text"
-                placeholder="Enter your full name"
-                value={fullname}
-                onChange={(e) => setFullname(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm transition-all duration-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white outline-none"
-              />
-            </div>
-
+          <form onSubmit={handleLogin} className="space-y-6">
+            {error && (
+              <div className="text-red-500 text-sm p-3 bg-red-50 border border-red-200 rounded-lg">
+                {error}
+              </div>
+            )}
             <div>
               <label
                 htmlFor="email"
@@ -109,19 +74,13 @@ export default function SignupPage() {
               <input
                 id="password"
                 type="password"
-                placeholder="Create a strong password"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm transition-all duration-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white outline-none"
               />
             </div>
-
-            {error && (
-              <div className="text-red-500 text-sm p-3 bg-red-50 border border-red-200 rounded-lg">
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"
@@ -150,21 +109,21 @@ export default function SignupPage() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Creating account...
+                  Signing in...
                 </>
               ) : (
-                "Create Account"
+                "Sign In"
               )}
             </button>
           </form>
 
           <div className="mt-6 text-center text-gray-500 text-sm">
-            Already have an account?{" "}
+            Don&apos;t have an account?{" "}
             <a
-              href="/login"
+              href="/signup"
               className="text-green-500 font-medium hover:text-green-600 hover:underline transition-colors"
             >
-              Sign in
+              Create one
             </a>
           </div>
         </div>

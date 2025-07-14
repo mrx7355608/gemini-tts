@@ -7,7 +7,7 @@ import { UserData, UserFormData } from "@/lib/types";
 import UsersTable from "@/app/components/UsersTable";
 import UserForm from "@/app/components/UserForm";
 import DeleteConfirmationModal from "@/app/components/DeleteConfirmationModal";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const supabase = createClient();
 

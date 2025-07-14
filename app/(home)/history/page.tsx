@@ -1,8 +1,7 @@
 import { getHistory } from "@/lib/history-services";
-import Navbar from "../components/Navbar";
 import { Clock, Mic, Settings } from "lucide-react";
 import { HistoryItem } from "@/lib/types";
-import HistoryTable from "../components/HistoryTable";
+import HistoryTable from "../../components/HistoryTable";
 
 export default async function HistoryPage() {
   const history = await getHistory();
@@ -11,7 +10,6 @@ export default async function HistoryPage() {
   if (history && "error" in history) {
     return (
       <>
-        <Navbar />
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 max-w-md w-full text-center">
             <div className="text-red-500 mb-4">
@@ -31,7 +29,6 @@ export default async function HistoryPage() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen p-6">
         <div className="p-8 w-full mx-auto">
           {/* Header */}
