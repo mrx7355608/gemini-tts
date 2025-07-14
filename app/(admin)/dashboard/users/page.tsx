@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, Search } from "lucide-react";
 import { UserData, UserFormData } from "@/lib/types";
 import UsersTable from "@/app/components/UsersTable";
 import UserForm from "@/app/components/UserForm";
@@ -13,6 +13,7 @@ const supabase = createClient();
 
 export default function Users() {
   const [users, setUsers] = useState<UserData[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -26,10 +27,29 @@ export default function Users() {
   });
   const [submitting, setSubmitting] = useState(false);
   const { user } = useAuth();
+  const [search, setSearch] = useState("");
+  const [sortOrder, setSortOrder] = useState("new"); // 'new' or 'old'
 
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    let filtered = users;
+    if (search) {
+      filtered = filtered.filter(
+        (u) =>
+          u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+          u.email?.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    filtered = filtered.slice().sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return sortOrder === "new" ? dateB - dateA : dateA - dateB;
+    });
+    setFilteredUsers(filtered);
+  }, [search, users, sortOrder]);
 
   const fetchUsers = async () => {
     try {
@@ -187,18 +207,44 @@ export default function Users() {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-          <p className="text-gray-600">Manage user accounts and permissions</p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+            Users
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Manage user accounts and permissions
+          </p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Create User
-        </button>
+        <div className="flex items-center gap-4">
+          <span className="relative w-64">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <Search className="w-4 h-4" />
+            </span>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search users..."
+              className="pl-9 pr-3 py-2 w-full rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
+            />
+          </span>
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="py-2 px-3 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
+          >
+            <option value="new">Newest</option>
+            <option value="old">Oldest</option>
+          </select>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Create User
+          </button>
+        </div>
       </div>
 
       {/* Error Message */}
@@ -210,7 +256,7 @@ export default function Users() {
 
       {/* Users Table */}
       <UsersTable
-        users={users}
+        users={filteredUsers}
         onEdit={openEditModal}
         onDelete={openDeleteModal}
       />
