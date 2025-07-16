@@ -84,41 +84,30 @@ export default function Users() {
       setSubmitting(true);
 
       // Validate form data
-      if (!formData.email || !formData.password) {
-        throw new Error("Email and password are required");
+      if (!formData.email || !formData.password || !formData.full_name) {
+        throw new Error("All fields are required");
       }
 
-      // Create user
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.full_name,
-            role: formData.role,
-          },
+      const response = await fetch("/api/users", {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
         },
       });
 
-      if (error) throw error;
+      const data = await response.json();
+      console.log(data);
 
-      // Insert into user_profile table
-      const { error: insertError } = await supabase
-        .from("user_profile")
-        .insert({
-          id: data.user?.id,
-          full_name: formData.full_name,
-          email: formData.email,
-          role: formData.role,
-        });
-
-      if (insertError) throw insertError;
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
       setShowCreateModal(false);
-      setFormData({ full_name: "", email: "", role: "user" });
+      setFormData({ full_name: "", email: "", role: "user", password: "" });
       fetchUsers();
-    } catch (err) {
-      setError("Failed to create user");
+    } catch (err: any) {
+      setError(err.message);
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -130,23 +119,47 @@ export default function Users() {
 
     try {
       setSubmitting(true);
-      const { error } = await supabase
-        .from("user_profile")
-        .update({
-          full_name: formData.full_name,
-          email: formData.email,
-          role: formData.role,
-        })
-        .eq("id", selectedUser.id);
 
-      if (error) throw error;
+      const updateData = {
+        full_name: "",
+        email: "",
+        role: "",
+        password: "",
+      };
+
+      if (formData.email !== selectedUser.email) {
+        updateData.email = formData.email;
+      }
+
+      if (formData.full_name !== selectedUser.full_name) {
+        updateData.full_name = formData.full_name;
+      }
+
+      if (formData.password) {
+        updateData.password = formData.password;
+      }
+
+      const response = await fetch(`/api/users/${selectedUser.id}`, {
+        method: "PATCH",
+        body: JSON.stringify(updateData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
       setShowEditModal(false);
       setSelectedUser(null);
-      setFormData({ full_name: "", email: "", role: "user" });
+      setFormData({ full_name: "", email: "", role: "user", password: "" });
       fetchUsers();
-    } catch (err) {
-      setError("Failed to update user");
+    } catch (err: any) {
+      setError(err.message);
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -158,18 +171,23 @@ export default function Users() {
 
     try {
       setSubmitting(true);
-      const { error } = await supabase
-        .from("user_profile")
-        .delete()
-        .eq("id", selectedUser.id);
 
-      if (error) throw error;
+      const response = await fetch(`/api/users/${selectedUser.id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
       setShowDeleteModal(false);
       setSelectedUser(null);
       fetchUsers();
-    } catch (err) {
-      setError("Failed to delete user");
+    } catch (err: any) {
+      setError(err.message);
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -192,7 +210,7 @@ export default function Users() {
   };
 
   const resetForm = () => {
-    setFormData({ full_name: "", email: "", role: "user" });
+    setFormData({ full_name: "", email: "", role: "user", password: "" });
     setSelectedUser(null);
   };
 
@@ -205,7 +223,7 @@ export default function Users() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto overflow-y-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div className="flex-1 min-w-0">
@@ -259,6 +277,7 @@ export default function Users() {
         users={filteredUsers}
         onEdit={openEditModal}
         onDelete={openDeleteModal}
+        onBlock={() => {}}
       />
 
       {/* Create User Modal */}
