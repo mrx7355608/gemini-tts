@@ -83,7 +83,7 @@ export const convertPcmToMp3 = task({
       // Save converted mp3 file to supabase
       logger.log("Saving to supabase...");
       const { error } = await supabase.storage
-        .from("audio-file")
+        .from("audio-files")
         .upload(filename, mp3File, {
           contentType: "audio/mpeg",
         });
