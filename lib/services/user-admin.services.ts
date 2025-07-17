@@ -161,7 +161,6 @@ export default function UserAdminServices() {
   ) => {
     return await errorLogger({
       raisedBy: "Supabase - Create User",
-      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
       executionFunc: createUser,
       args: [full_name, email, password, role],
     });
@@ -170,7 +169,6 @@ export default function UserAdminServices() {
   const updateUserEmailWithErrorLogging = async (id: string, email: string) => {
     return await errorLogger({
       raisedBy: "Supabase - Update User Email",
-      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
       executionFunc: updateUserEmail,
       args: [id, email],
     });
@@ -182,7 +180,6 @@ export default function UserAdminServices() {
   ) => {
     return await errorLogger({
       raisedBy: "Supabase - Update Full Name",
-      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
       executionFunc: updateUserFullName,
       args: [id, full_name],
     });
@@ -191,7 +188,6 @@ export default function UserAdminServices() {
   const updateUserRoleWithErrorLogging = async (id: string, role: string) => {
     return await errorLogger({
       raisedBy: "Supabase - Update Role",
-      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
       executionFunc: updateUserRole,
       args: [id, role],
     });
@@ -200,7 +196,6 @@ export default function UserAdminServices() {
   const deleteUserWithErrorLogging = async (id: string) => {
     return await errorLogger({
       raisedBy: "Supabase - Delete User",
-      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
       executionFunc: deleteUser,
       args: [id],
     });
@@ -209,7 +204,6 @@ export default function UserAdminServices() {
   const banUserWithErrorLogging = async (id: string) => {
     return await errorLogger({
       raisedBy: "Supabase - Ban User",
-      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
       executionFunc: banUser,
       args: [id],
     });
@@ -218,7 +212,6 @@ export default function UserAdminServices() {
   const unbanUserWithErrorLogging = async (id: string) => {
     return await errorLogger({
       raisedBy: "Supabase - Unban User",
-      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
       executionFunc: unbanUser,
       args: [id],
     });
@@ -227,7 +220,6 @@ export default function UserAdminServices() {
   const getBannedUsersIDsWithErrorLogging = async () => {
     return await errorLogger({
       raisedBy: "Supabase - Get Banned Users IDs",
-      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
       executionFunc: getBannedUsersIDs,
       args: [],
     });
@@ -239,7 +231,6 @@ export default function UserAdminServices() {
   ) => {
     return await errorLogger({
       raisedBy: "Supabase - Update Password",
-      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
       executionFunc: updateUserPassword,
       args: [id, password],
     });
