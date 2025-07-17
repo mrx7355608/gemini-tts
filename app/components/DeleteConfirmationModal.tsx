@@ -1,20 +1,46 @@
 import { X, Trash2, Loader2 } from "lucide-react";
 import { UserData } from "@/lib/types";
+import { useState } from "react";
 
 interface DeleteConfirmationModalProps {
   user: UserData | null;
   onConfirm: () => void;
   onCancel: () => void;
-  submitting: boolean;
 }
 
 export default function DeleteConfirmationModal({
   user,
   onConfirm,
   onCancel,
-  submitting,
 }: DeleteConfirmationModalProps) {
+  const [submitting, setSubmitting] = useState(false);
+
   if (!user) return null;
+
+  const handleDeleteUser = async () => {
+    if (!user) return;
+
+    try {
+      setSubmitting(true);
+
+      const response = await fetch(`/api/users/${user.id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      onConfirm();
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div
@@ -35,7 +61,7 @@ export default function DeleteConfirmationModal({
         </div>
         <div className="mb-6">
           <p className="text-gray-700">
-            Are you sure you want to delete <strong>{user.name}</strong>?
+            Are you sure you want to delete <strong>{user.full_name}</strong>?
           </p>
           <p className="text-sm text-gray-500 mt-2">
             This action cannot be undone.
@@ -49,7 +75,7 @@ export default function DeleteConfirmationModal({
             Cancel
           </button>
           <button
-            onClick={onConfirm}
+            onClick={handleDeleteUser}
             disabled={submitting}
             className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
           >

@@ -1,41 +1,33 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { Plus, Loader2, Search } from "lucide-react";
-import { UserData, UserFormData } from "@/lib/types";
+import { UserData } from "@/lib/types";
 import UsersTable from "@/app/components/UsersTable";
-import UserForm from "@/app/components/UserForm";
 import DeleteConfirmationModal from "@/app/components/DeleteConfirmationModal";
 import { useAuth } from "../../../contexts/AuthContext";
 import CreateUserForm from "@/app/components/CreateUserForm";
 import EditUserForm from "@/app/components/EditUserForm";
 import ChangePasswordModal from "@/app/components/ChangePasswordModal";
 import BlockConfirmationModal from "@/app/components/BlockConfirmationModal";
-
-const supabase = createClient();
+import useUsers from "@/app/hooks/useUsers";
 
 export default function Users() {
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { user } = useAuth();
+  const { users, bannedUsersIDs, loading, error, refreshUsers } = useUsers();
+
+  // modals states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const { user } = useAuth();
-  const [search, setSearch] = useState("");
-  const [sortOrder, setSortOrder] = useState("new"); // 'new' or 'old'
-  const [bannedUsersIDs, setBannedUsersIDs] = useState<string[]>([]);
 
-  useEffect(() => {
-    fetchUsers();
-    fetchBannedUsers();
-  }, []);
+  // search and sort states
+  const [search, setSearch] = useState("");
+  const [sortOrder, setSortOrder] = useState("new");
+  const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
 
   useEffect(() => {
     let filtered = users;
@@ -54,30 +46,6 @@ export default function Users() {
     setFilteredUsers(filtered);
   }, [search, users, sortOrder]);
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("user_profile")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setUsers(data || []);
-    } catch (err) {
-      setError("Failed to fetch users");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchBannedUsers = async () => {
-    const response = await fetch("/api/users");
-    const data = await response.json();
-    setBannedUsersIDs(data.data);
-  };
-
   // if (user?.role !== "admin") {
   //   return (
   //     <div className="flex items-center justify-center min-h-screen">
@@ -87,34 +55,6 @@ export default function Users() {
   //     </div>
   //   );
   // }
-
-  const handleDeleteUser = async () => {
-    if (!selectedUser) return;
-
-    try {
-      setSubmitting(true);
-
-      const response = await fetch(`/api/users/${selectedUser.id}`, {
-        method: "DELETE",
-      });
-
-      const data = await response.json();
-      console.log(data);
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      setShowDeleteModal(false);
-      setSelectedUser(null);
-      fetchUsers();
-    } catch (err: any) {
-      setError(err.message);
-      console.error(err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const openEditModal = (user: UserData) => {
     setSelectedUser(user);
@@ -214,7 +154,7 @@ export default function Users() {
           onConfirm={() => {
             setShowCreateModal(false);
             setSelectedUser(null);
-            fetchUsers();
+            refreshUsers();
           }}
         />
       )}
@@ -230,7 +170,7 @@ export default function Users() {
           onConfirm={() => {
             setShowEditModal(false);
             setSelectedUser(null);
-            fetchUsers();
+            refreshUsers();
           }}
         />
       )}
@@ -239,12 +179,15 @@ export default function Users() {
       {showDeleteModal && (
         <DeleteConfirmationModal
           user={selectedUser}
-          onConfirm={handleDeleteUser}
+          onConfirm={() => {
+            setShowDeleteModal(false);
+            setSelectedUser(null);
+            refreshUsers();
+          }}
           onCancel={() => {
             setShowDeleteModal(false);
             setSelectedUser(null);
           }}
-          submitting={submitting}
         />
       )}
 
@@ -255,7 +198,7 @@ export default function Users() {
           onConfirm={() => {
             setShowChangePasswordModal(false);
             setSelectedUser(null);
-            fetchUsers();
+            refreshUsers();
           }}
           onCancel={() => {
             setShowChangePasswordModal(false);
@@ -271,7 +214,7 @@ export default function Users() {
           onConfirm={() => {
             setShowBlockModal(false);
             setSelectedUser(null);
-            fetchUsers();
+            refreshUsers();
           }}
           onCancel={() => {
             setShowBlockModal(false);
