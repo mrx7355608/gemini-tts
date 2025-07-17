@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { errorLogger } from "../errorLogger";
 
 export default function UserAdminServices() {
   const supabaseUrl = process.env.SUPABASE_URL!;
@@ -149,15 +150,110 @@ export default function UserAdminServices() {
     return bannedUsers;
   }
 
+  // #######################################
+  //         Error Logging Functions
+  // #######################################
+  const createUserWithErrorLogging = async (
+    full_name: string,
+    email: string,
+    password: string,
+    role: string
+  ) => {
+    return await errorLogger({
+      raisedBy: "Supabase - Create User",
+      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
+      executionFunc: createUser,
+      args: [full_name, email, password, role],
+    });
+  };
+
+  const updateUserEmailWithErrorLogging = async (id: string, email: string) => {
+    return await errorLogger({
+      raisedBy: "Supabase - Update User Email",
+      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
+      executionFunc: updateUserEmail,
+      args: [id, email],
+    });
+  };
+
+  const updateUserFullNameWithErrorLogging = async (
+    id: string,
+    full_name: string
+  ) => {
+    return await errorLogger({
+      raisedBy: "Supabase - Update Full Name",
+      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
+      executionFunc: updateUserFullName,
+      args: [id, full_name],
+    });
+  };
+
+  const updateUserRoleWithErrorLogging = async (id: string, role: string) => {
+    return await errorLogger({
+      raisedBy: "Supabase - Update Role",
+      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
+      executionFunc: updateUserRole,
+      args: [id, role],
+    });
+  };
+
+  const deleteUserWithErrorLogging = async (id: string) => {
+    return await errorLogger({
+      raisedBy: "Supabase - Delete User",
+      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
+      executionFunc: deleteUser,
+      args: [id],
+    });
+  };
+
+  const banUserWithErrorLogging = async (id: string) => {
+    return await errorLogger({
+      raisedBy: "Supabase - Ban User",
+      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
+      executionFunc: banUser,
+      args: [id],
+    });
+  };
+
+  const unbanUserWithErrorLogging = async (id: string) => {
+    return await errorLogger({
+      raisedBy: "Supabase - Unban User",
+      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
+      executionFunc: unbanUser,
+      args: [id],
+    });
+  };
+
+  const getBannedUsersIDsWithErrorLogging = async () => {
+    return await errorLogger({
+      raisedBy: "Supabase - Get Banned Users IDs",
+      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
+      executionFunc: getBannedUsersIDs,
+      args: [],
+    });
+  };
+
+  const updateUserPasswordWithErrorLogging = async (
+    id: string,
+    password: string
+  ) => {
+    return await errorLogger({
+      raisedBy: "Supabase - Update Password",
+      user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
+      executionFunc: updateUserPassword,
+      args: [id, password],
+    });
+  };
+
   return {
-    createUser,
-    updateUserEmail,
-    updateUserFullName,
-    updateUserRole,
-    deleteUser,
-    banUser,
-    unbanUser,
-    updateUserPassword,
-    getBannedUsersIDs,
+    createUser: createUserWithErrorLogging,
+    updateUserEmail: updateUserEmailWithErrorLogging,
+    updateUserFullName: updateUserFullNameWithErrorLogging,
+    updateUserRole: updateUserRoleWithErrorLogging,
+    deleteUser: deleteUserWithErrorLogging,
+    banUser: banUserWithErrorLogging,
+    unbanUser: unbanUserWithErrorLogging,
+    updateUserPassword: updateUserPasswordWithErrorLogging,
+    getBannedUsersIDs: getBannedUsersIDsWithErrorLogging,
   };
 }
