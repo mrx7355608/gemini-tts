@@ -89,6 +89,14 @@ export default function UserAdminServices() {
     if (error) {
       return { error: error.message };
     }
+
+    // Update user role in user_profile table
+    const { error: error2 } = await supabase
+      .from("user_profile")
+      .update({ role })
+      .eq("id", id);
+    if (error2) throw error2;
+
     return { success: true };
   }
 

@@ -101,6 +101,10 @@ export default function Users() {
         updateData.full_name = formData.full_name;
       }
 
+      if (formData.role !== selectedUser.role) {
+        updateData.role = formData.role;
+      }
+
       if (formData.password) {
         updateData.password = formData.password;
       }
