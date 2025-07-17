@@ -6,15 +6,18 @@ import {
   Ban,
   X,
   AlertTriangle,
+  Key,
 } from "lucide-react";
 import { UserData } from "@/lib/types";
 import { useEffect, useState } from "react";
+import ChangePasswordModal from "./ChangePasswordModal";
 
 interface UsersTableProps {
   users: UserData[];
   onEdit: (user: UserData) => void;
   onDelete: (user: UserData) => void;
   onBlock: (user: UserData) => void;
+  onChangePassword: (user: UserData) => void;
 }
 
 interface BlockConfirmationModalProps {
@@ -95,6 +98,7 @@ export default function UsersTable({
   onEdit,
   onDelete,
   onBlock,
+  onChangePassword,
 }: UsersTableProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [showBlockModal, setShowBlockModal] = useState(false);
@@ -235,6 +239,13 @@ export default function UsersTable({
                             >
                               <Edit className="w-4 h-4 mr-3 text-gray-400" />
                               Edit User
+                            </button>
+                            <button
+                              className="flex items-center w-full px-4 py-3 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                              onClick={() => onChangePassword(user)}
+                            >
+                              <Key className="w-4 h-4 mr-3 text-blue-500" />
+                              Change Password
                             </button>
                             <button
                               className="flex items-center w-full px-4 py-3 text-sm text-amber-600 hover:bg-amber-50 transition-colors"

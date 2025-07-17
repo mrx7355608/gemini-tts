@@ -10,6 +10,7 @@ import DeleteConfirmationModal from "@/app/components/DeleteConfirmationModal";
 import { useAuth } from "../../../contexts/AuthContext";
 import CreateUserForm from "@/app/components/CreateUserForm";
 import EditUserForm from "@/app/components/EditUserForm";
+import ChangePasswordModal from "@/app/components/ChangePasswordModal";
 
 const supabase = createClient();
 
@@ -21,6 +22,7 @@ export default function Users() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
     full_name: "",
@@ -124,6 +126,11 @@ export default function Users() {
     setShowDeleteModal(true);
   };
 
+  const openChangePasswordModal = (user: UserData) => {
+    setSelectedUser(user);
+    setShowChangePasswordModal(true);
+  };
+
   const resetForm = () => {
     setFormData({ full_name: "", email: "", role: "user", password: "" });
     setSelectedUser(null);
@@ -193,14 +200,19 @@ export default function Users() {
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onBlock={() => {}}
+        onChangePassword={openChangePasswordModal}
       />
 
       {/* Create User Modal */}
       {showCreateModal && (
         <CreateUserForm
-          onCancel={() => setShowCreateModal(false)}
+          onCancel={() => {
+            setShowCreateModal(false);
+            setSelectedUser(null);
+          }}
           onConfirm={() => {
             setShowCreateModal(false);
+            setSelectedUser(null);
             fetchUsers();
           }}
         />
@@ -210,9 +222,13 @@ export default function Users() {
       {showEditModal && selectedUser && (
         <EditUserForm
           selectedUser={selectedUser}
-          onCancel={() => setShowEditModal(false)}
+          onCancel={() => {
+            setShowEditModal(false);
+            setSelectedUser(null);
+          }}
           onConfirm={() => {
             setShowEditModal(false);
+            setSelectedUser(null);
             fetchUsers();
           }}
         />
@@ -228,6 +244,22 @@ export default function Users() {
             resetForm();
           }}
           submitting={submitting}
+        />
+      )}
+
+      {/* Change Password Modal */}
+      {showChangePasswordModal && (
+        <ChangePasswordModal
+          user={selectedUser}
+          onConfirm={() => {
+            setShowChangePasswordModal(false);
+            setSelectedUser(null);
+            fetchUsers();
+          }}
+          onCancel={() => {
+            setShowChangePasswordModal(false);
+            setSelectedUser(null);
+          }}
         />
       )}
     </div>

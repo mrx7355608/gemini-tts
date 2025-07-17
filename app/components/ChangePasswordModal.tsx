@@ -1,67 +1,60 @@
-import { X, Save, Loader2 } from "lucide-react";
+import { X, Save, Loader2, Key } from "lucide-react";
 import { UserData } from "@/lib/types";
 import { useState } from "react";
 
-interface UserFormProps {
-  selectedUser: UserData;
-  onCancel: () => void;
+interface ChangePasswordModalProps {
+  user: UserData | null;
   onConfirm: () => void;
+  onCancel: () => void;
 }
 
-export default function UserForm({
-  selectedUser,
-  onCancel,
+export default function ChangePasswordModal({
+  user,
   onConfirm,
-}: UserFormProps) {
+  onCancel,
+}: ChangePasswordModalProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    full_name: selectedUser.full_name,
-    email: selectedUser.email,
-    role: selectedUser.role,
+  const [passwords, setPasswords] = useState({
+    newPassword: "",
+    confirmPassword: "",
   });
 
-  const handleEditUser = async (e: React.FormEvent<HTMLFormElement>) => {
+  if (!user) return null;
+
+  const handleChangePassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (passwords.newPassword.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     try {
-      e.preventDefault();
-      if (!selectedUser) return;
       setSubmitting(true);
+      setError(null);
 
-      const updateData = {
-        full_name: "",
-        email: "",
-        role: "",
-      };
-
-      if (formData.email !== selectedUser.email) {
-        updateData.email = formData.email;
-      }
-
-      if (formData.full_name !== selectedUser.full_name) {
-        updateData.full_name = formData.full_name;
-      }
-
-      if (formData.role !== selectedUser.role) {
-        updateData.role = formData.role;
-      }
-
-      const response = await fetch(`/api/users/${selectedUser.id}`, {
+      const response = await fetch(`/api/users/${user.id}`, {
         method: "PATCH",
-        body: JSON.stringify(updateData),
+        body: JSON.stringify({ password: passwords.newPassword }),
         headers: {
           "Content-Type": "application/json",
         },
       });
 
       const data = await response.json();
-      console.log(data);
 
       if (data.error) {
         throw new Error(data.error);
       }
 
       onConfirm();
-      setFormData({ full_name: "", email: "", role: "user" });
+      setPasswords({ newPassword: "", confirmPassword: "" });
     } catch (err: any) {
       setError(err.message);
       console.error(err);
@@ -72,12 +65,15 @@ export default function UserForm({
 
   return (
     <div
-      className="fixed inset-0 bg-gray-600 backdrop-blur-sm overflow-y-auto h-full w-full z-50"
+      className="fixed inset-0 backdrop-blur-sm overflow-y-auto h-full w-full z-50"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
     >
       <div className="relative top-20 mx-auto p-5 w-96 shadow-lg rounded-md bg-white">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Edit User</h3>
+          <h3 className="text-lg font-medium text-blue-600 flex items-center gap-2">
+            <Key className="w-5 h-5" />
+            Change Password
+          </h3>
           <button
             onClick={onCancel}
             className="text-gray-400 hover:text-gray-600"
@@ -85,52 +81,60 @@ export default function UserForm({
             <X className="w-5 h-5" />
           </button>
         </div>
-        <form onSubmit={handleEditUser}>
+
+        <div className="mb-4">
+          <p className="text-gray-700">
+            Changing password for <strong>{user.full_name}</strong>
+          </p>
+          <p className="text-sm text-gray-500 mt-1">
+            Enter a new password for this user.
+          </p>
+        </div>
+
+        <form onSubmit={handleChangePassword}>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name
+                New Password
               </label>
               <input
-                type="text"
+                type="password"
                 required
-                value={formData.full_name}
+                value={passwords.newPassword}
                 onChange={(e) =>
-                  setFormData({ ...formData, full_name: e.target.value })
+                  setPasswords({ ...passwords, newPassword: e.target.value })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter new password"
               />
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+                Confirm Password
               </label>
               <input
-                type="email"
+                type="password"
                 required
-                value={formData.email}
+                value={passwords.confirmPassword}
                 onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
+                  setPasswords({
+                    ...passwords,
+                    confirmPassword: e.target.value,
+                  })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Confirm new password"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Role
-              </label>
-              <select
-                value={formData.role}
-                onChange={(e) =>
-                  setFormData({ ...formData, role: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
             </div>
           </div>
+
+          {error && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
           <div className="flex justify-end gap-3 mt-6">
             <button
               type="button"
@@ -147,9 +151,9 @@ export default function UserForm({
               {submitting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <Save className="w-4 h-4" />
+                <Key className="w-4 h-4" />
               )}
-              Update User
+              Change Password
             </button>
           </div>
         </form>
