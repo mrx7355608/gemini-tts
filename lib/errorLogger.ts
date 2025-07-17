@@ -1,4 +1,6 @@
-import { createClient } from "./supabase/client";
+"use server";
+
+import { createClient } from "./supabase/server";
 
 interface ErrorLoggerData<T> {
   raisedBy: string;
@@ -21,16 +23,26 @@ export async function errorLogger<T>({
   }
 }
 
-export async function logError(error: any, raisedBy: string) {
+export async function logError(error: any, raisedBy: string, user_id?: string) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
+
+    // Get user id
+    let userId = user_id;
+
+    if (!user_id) {
+      const { data } = await supabase.auth.getUser();
+      userId = data.user?.id;
+    }
+
+    // Log error
     const { error: err } = await supabase
       .from("error-logs")
       .insert({
         error_message: error.message,
         error_description: "No description provided",
         raised_by: raisedBy,
-        user_id: "bca7e52f-5437-4e9e-83df-0a1729762c66",
+        user_id: userId,
       })
       .select();
     if (err) {

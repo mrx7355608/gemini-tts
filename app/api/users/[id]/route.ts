@@ -39,7 +39,7 @@ export async function PATCH(
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.log(error);
-    await logError(error, "API Route - Update User");
+    await logError(error, "API Error - Update User");
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

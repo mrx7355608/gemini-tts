@@ -12,6 +12,13 @@ let modelUsed = null;
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
+
+  // Get user id
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
@@ -99,13 +106,14 @@ export async function POST(req: NextRequest) {
       "convert-pcm-to-mp3",
       {
         audioUrl: pcmFilePaths,
+        user_id: data.user.id,
       }
     );
 
     return NextResponse.json(handler, { status: 200 });
   } catch (err: any) {
     const parsedError = parseError(err);
-    await logError(parsedError, `API Route - Generate Audio`);
+    await logError(parsedError, `API Error - Generate Audio`);
     return NextResponse.json({ error: parsedError.message }, { status: 500 });
   }
 }

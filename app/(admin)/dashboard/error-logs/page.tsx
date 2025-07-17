@@ -19,6 +19,7 @@ interface ErrorLog {
   raised_by: string;
   user_id: string;
   created_at: string;
+  user_email?: string; // Add user email field
 }
 
 export default function ErrorLogs() {
@@ -37,14 +38,28 @@ export default function ErrorLogs() {
 
       const { data, error: fetchError } = await supabase
         .from("error-logs")
-        .select("*")
+        .select(
+          `
+          *,
+          user_profile!inner(email)
+        `
+        )
         .order("created_at", { ascending: false });
 
       if (fetchError) {
         throw fetchError;
       }
 
-      const filteredData = data.filter((log) => log.error_message !== null);
+      // Transform the data to include user email at the top level
+      const transformedData =
+        data?.map((log) => ({
+          ...log,
+          user_email: log.user_profile?.email || "Unknown",
+        })) || [];
+
+      const filteredData = transformedData.filter(
+        (log) => log.error_message !== null
+      );
 
       setErrorLogs(filteredData || []);
       setFilteredLogs(filteredData || []);
@@ -77,7 +92,8 @@ export default function ErrorLogs() {
         (log) =>
           log.error_message.toLowerCase().includes(searchTerm.toLowerCase()) ||
           log.raised_by.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          log.error_description.toLowerCase().includes(searchTerm.toLowerCase())
+          (log.user_email &&
+            log.user_email.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
@@ -111,7 +127,7 @@ export default function ErrorLogs() {
     return "bg-gray-100 text-gray-800";
   };
 
-  const categories = ["All", "Supabase", "API Route", "Trigger"];
+  const categories = ["All", "Supabase", "API Error", "Trigger"];
 
   if (loading) {
     return (
@@ -179,7 +195,7 @@ export default function ErrorLogs() {
             </div>
             <input
               type="text"
-              placeholder="Search error logs..."
+              placeholder="Search by error message, source, or user email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
@@ -303,10 +319,10 @@ export default function ErrorLogs() {
                     Operation
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Time
+                    User
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Details
+                    Time
                   </th>
                 </tr>
               </thead>
@@ -342,6 +358,14 @@ export default function ErrorLogs() {
                         </span>
                       </div>
                     </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center">
+                        <User className="w-4 h-4 text-gray-400 mr-2" />
+                        <span className="text-sm text-gray-900">
+                          {log.user_email || "Unknown"}
+                        </span>
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Clock className="w-4 h-4 text-gray-400 mr-2" />
@@ -353,14 +377,6 @@ export default function ErrorLogs() {
                             {new Date(log.created_at).toLocaleTimeString()}
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-500 max-w-xs">
-                        {log.error_description &&
-                        log.error_description !== "No description provided"
-                          ? truncateText(log.error_description, 60)
-                          : "No description available"}
                       </div>
                     </td>
                   </tr>

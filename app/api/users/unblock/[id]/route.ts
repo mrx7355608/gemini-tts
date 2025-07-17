@@ -16,7 +16,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    await logError(error, "API Route - Unblock User");
+    await logError(error, "API Error - Unblock User");
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -16,7 +16,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    await logError(error, "API Route - Block User");
+    await logError(error, "API Error - Block User");
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

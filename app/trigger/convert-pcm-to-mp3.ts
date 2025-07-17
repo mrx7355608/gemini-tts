@@ -18,7 +18,10 @@ export const convertPcmToMp3 = task({
   retry: {
     maxAttempts: 1,
   },
-  run: async (payload: { audioUrl: (string | undefined)[] }) => {
+  run: async (payload: {
+    audioUrl: (string | undefined)[];
+    user_id: string;
+  }) => {
     try {
       const { audioUrl } = payload;
 
@@ -110,7 +113,7 @@ export const convertPcmToMp3 = task({
         url: publicUrl,
       };
     } catch (error) {
-      await logError(error, "Trigger - MP3 Conversion");
+      await logError(error, "Trigger - MP3 Conversion", payload.user_id);
       throw error;
     }
   },
