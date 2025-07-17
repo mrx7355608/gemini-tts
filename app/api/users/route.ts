@@ -6,9 +6,9 @@ const userAdminServices = UserAdminServices();
 const { createUser, getBannedUsersIDs } = userAdminServices;
 
 export async function POST(req: NextRequest) {
-  const { full_name, email, password } = await req.json();
+  const { full_name, email, password, role } = await req.json();
   try {
-    await createUser(full_name, email, password);
+    await createUser(full_name, email, password, role);
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

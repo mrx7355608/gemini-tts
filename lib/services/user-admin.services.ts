@@ -13,13 +13,14 @@ export default function UserAdminServices() {
   async function createUser(
     full_name: string,
     email: string,
-    password: string
+    password: string,
+    role: string
   ) {
     const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
       user_metadata: {
-        role: "user",
+        role,
         full_name,
       },
     });
@@ -29,7 +30,7 @@ export default function UserAdminServices() {
     const { user } = data;
     const { error: error2 } = await supabase
       .from("user_profile")
-      .insert({ id: user.id, email: user.email, full_name });
+      .insert({ id: user.id, email: user.email, full_name, role });
 
     if (error2) throw error2;
 

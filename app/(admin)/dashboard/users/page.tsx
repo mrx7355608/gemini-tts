@@ -8,6 +8,7 @@ import UsersTable from "@/app/components/UsersTable";
 import UserForm from "@/app/components/UserForm";
 import DeleteConfirmationModal from "@/app/components/DeleteConfirmationModal";
 import { useAuth } from "../../../contexts/AuthContext";
+import CreateUserForm from "@/app/components/CreateUserForm";
 
 const supabase = createClient();
 
@@ -78,41 +79,6 @@ export default function Users() {
   //     </div>
   //   );
   // }
-
-  const handleCreateUser = async () => {
-    try {
-      setSubmitting(true);
-
-      // Validate form data
-      if (!formData.email || !formData.password || !formData.full_name) {
-        throw new Error("All fields are required");
-      }
-
-      const response = await fetch("/api/users", {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await response.json();
-      console.log(data);
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      setShowCreateModal(false);
-      setFormData({ full_name: "", email: "", role: "user", password: "" });
-      fetchUsers();
-    } catch (err: any) {
-      setError(err.message);
-      console.error(err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handleEditUser = async () => {
     if (!selectedUser) return;
@@ -282,17 +248,12 @@ export default function Users() {
 
       {/* Create User Modal */}
       {showCreateModal && (
-        <UserForm
-          title="Create New User"
-          formData={formData}
-          setFormData={setFormData}
-          onSubmit={handleCreateUser}
-          onCancel={() => {
+        <CreateUserForm
+          onCancel={() => setShowCreateModal(false)}
+          onConfirm={() => {
             setShowCreateModal(false);
-            resetForm();
+            fetchUsers();
           }}
-          submitting={submitting}
-          isEdit={false}
         />
       )}
 
