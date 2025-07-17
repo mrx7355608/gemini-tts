@@ -9,10 +9,17 @@ import {
   User,
   LogOut,
   Home,
+  LayoutDashboard,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useEffect, useState } from "react";
 
 const adminNavItems = [
+  {
+    name: "Dashboard",
+    href: "/dashboard",
+    icon: <LayoutDashboard className="w-5 h-5" />,
+  },
   {
     name: "User Management",
     href: "/dashboard/users",
@@ -43,6 +50,23 @@ const adminNavItems = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
+  const [isHealthy, setIsHealthy] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkHealth = async () => {
+      const response = await fetch("/api/health-check");
+      if (response.ok) {
+        setIsHealthy(true);
+        setIsLoading(false);
+      } else {
+        setIsHealthy(false);
+        setIsLoading(false);
+      }
+    };
+
+    checkHealth();
+  }, []);
 
   const handleLogout = async () => {
     await signOut();
@@ -75,6 +99,26 @@ export default function AdminSidebar() {
           })}
         </ul>
       </nav>
+
+      <div className="flex p-3 gap-2 items-center px-6 mb-2">
+        {isLoading ? (
+          <div className="w-3 h-3 rounded-full bg-gray-500 animate-pulse"></div>
+        ) : (
+          <div
+            className={`w-3 h-3 rounded-full ${
+              isHealthy ? "bg-green-500" : "bg-red-500"
+            }`}
+          ></div>
+        )}
+        <p className="text-sm text-gray-600">
+          {isLoading
+            ? "Fetching system status..."
+            : isHealthy
+            ? "System status is operational"
+            : "System status is degraded"}
+        </p>
+      </div>
+
       {/* User Section */}
       <div className="p-4 border-t border-gray-200">
         <div className="flex items-center space-x-3 mb-4">
