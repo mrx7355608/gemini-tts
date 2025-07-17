@@ -11,6 +11,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import CreateUserForm from "@/app/components/CreateUserForm";
 import EditUserForm from "@/app/components/EditUserForm";
 import ChangePasswordModal from "@/app/components/ChangePasswordModal";
+import BlockConfirmationModal from "@/app/components/BlockConfirmationModal";
 
 const supabase = createClient();
 
@@ -23,19 +24,17 @@ export default function Users() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [showBlockModal, setShowBlockModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
-  const [formData, setFormData] = useState<UserFormData>({
-    full_name: "",
-    email: "",
-    role: "user",
-  });
   const [submitting, setSubmitting] = useState(false);
   const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState("new"); // 'new' or 'old'
+  const [bannedUsersIDs, setBannedUsersIDs] = useState<string[]>([]);
 
   useEffect(() => {
     fetchUsers();
+    fetchBannedUsers();
   }, []);
 
   useEffect(() => {
@@ -71,6 +70,12 @@ export default function Users() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchBannedUsers = async () => {
+    const response = await fetch("/api/users");
+    const data = await response.json();
+    setBannedUsersIDs(data.data);
   };
 
   // if (user?.role !== "admin") {
@@ -113,11 +118,6 @@ export default function Users() {
 
   const openEditModal = (user: UserData) => {
     setSelectedUser(user);
-    setFormData({
-      full_name: user.full_name,
-      email: user.email,
-      role: user.role,
-    });
     setShowEditModal(true);
   };
 
@@ -131,9 +131,9 @@ export default function Users() {
     setShowChangePasswordModal(true);
   };
 
-  const resetForm = () => {
-    setFormData({ full_name: "", email: "", role: "user", password: "" });
-    setSelectedUser(null);
+  const openBlockModal = (user: UserData) => {
+    setSelectedUser(user);
+    setShowBlockModal(true);
   };
 
   if (loading) {
@@ -199,8 +199,9 @@ export default function Users() {
         users={filteredUsers}
         onEdit={openEditModal}
         onDelete={openDeleteModal}
-        onBlock={() => {}}
+        onBlock={openBlockModal}
         onChangePassword={openChangePasswordModal}
+        bannedUsersIDs={bannedUsersIDs}
       />
 
       {/* Create User Modal */}
@@ -241,7 +242,7 @@ export default function Users() {
           onConfirm={handleDeleteUser}
           onCancel={() => {
             setShowDeleteModal(false);
-            resetForm();
+            setSelectedUser(null);
           }}
           submitting={submitting}
         />
@@ -260,6 +261,23 @@ export default function Users() {
             setShowChangePasswordModal(false);
             setSelectedUser(null);
           }}
+        />
+      )}
+
+      {/* Block Confirmation Modal */}
+      {showBlockModal && (
+        <BlockConfirmationModal
+          user={selectedUser}
+          onConfirm={() => {
+            setShowBlockModal(false);
+            setSelectedUser(null);
+            fetchUsers();
+          }}
+          onCancel={() => {
+            setShowBlockModal(false);
+            setSelectedUser(null);
+          }}
+          isBlocked={bannedUsersIDs.includes(selectedUser?.id || "")}
         />
       )}
     </div>
