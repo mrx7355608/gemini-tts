@@ -9,6 +9,7 @@ import UserForm from "@/app/components/UserForm";
 import DeleteConfirmationModal from "@/app/components/DeleteConfirmationModal";
 import { useAuth } from "../../../contexts/AuthContext";
 import CreateUserForm from "@/app/components/CreateUserForm";
+import EditUserForm from "@/app/components/EditUserForm";
 
 const supabase = createClient();
 
@@ -79,62 +80,6 @@ export default function Users() {
   //     </div>
   //   );
   // }
-
-  const handleEditUser = async () => {
-    if (!selectedUser) return;
-
-    try {
-      setSubmitting(true);
-
-      const updateData = {
-        full_name: "",
-        email: "",
-        role: "",
-        password: "",
-      };
-
-      if (formData.email !== selectedUser.email) {
-        updateData.email = formData.email;
-      }
-
-      if (formData.full_name !== selectedUser.full_name) {
-        updateData.full_name = formData.full_name;
-      }
-
-      if (formData.role !== selectedUser.role) {
-        updateData.role = formData.role;
-      }
-
-      if (formData.password) {
-        updateData.password = formData.password;
-      }
-
-      const response = await fetch(`/api/users/${selectedUser.id}`, {
-        method: "PATCH",
-        body: JSON.stringify(updateData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await response.json();
-      console.log(data);
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      setShowEditModal(false);
-      setSelectedUser(null);
-      setFormData({ full_name: "", email: "", role: "user", password: "" });
-      fetchUsers();
-    } catch (err: any) {
-      setError(err.message);
-      console.error(err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
@@ -263,17 +208,13 @@ export default function Users() {
 
       {/* Edit User Modal */}
       {showEditModal && selectedUser && (
-        <UserForm
-          title="Edit User"
-          formData={formData}
-          setFormData={setFormData}
-          onSubmit={handleEditUser}
-          onCancel={() => {
+        <EditUserForm
+          selectedUser={selectedUser}
+          onCancel={() => setShowEditModal(false)}
+          onConfirm={() => {
             setShowEditModal(false);
-            resetForm();
+            fetchUsers();
           }}
-          submitting={submitting}
-          isEdit={true}
         />
       )}
 
