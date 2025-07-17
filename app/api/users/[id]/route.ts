@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import UserAdminServices from "@/lib/services/user-admin.services";
+import { logError } from "@/lib/errorLogger";
 
 const userAdminServices = UserAdminServices();
 
@@ -38,6 +39,7 @@ export async function PATCH(
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.log(error);
+    await logError(error, "API Route - Update User");
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -4,9 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 import type { convertPcmToMp3 } from "@/app/trigger/convert-pcm-to-mp3";
 import { splitPrompt } from "@/lib/split-prompt";
 import wav from "wav";
-import { createClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server";
 import { randomUUID } from "crypto";
+import { logError } from "@/lib/errorLogger";
 
+let modelUsed = null;
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -18,6 +20,8 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const { text, voice, temperature, model, styleInstructions } = body;
+
+  modelUsed = model.split("-").join(" ").toUpperCase();
 
   // Split prompt into subclips to avoid gemini text limit
   const subclips = splitPrompt(text, 1000);
@@ -44,9 +48,10 @@ export async function POST(req: NextRequest) {
     });
     const responses = await Promise.all(promises);
     console.log("Total responses: ", responses.length);
-    
+
     const filteredResponses = responses.filter((response) => {
-      const data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
+      const data =
+        response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
       return data !== undefined;
     });
     console.log("Total filtered responses: ", filteredResponses.length);
@@ -56,9 +61,11 @@ export async function POST(req: NextRequest) {
         response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data || ""
     );
     console.log("Total PCM strings: ", pcmStrings.length);
-    
+
     // Convert PCM strings to buffers
-    const filteredPcmStrings = pcmStrings.filter((pcmString) => pcmString !== "");
+    const filteredPcmStrings = pcmStrings.filter(
+      (pcmString) => pcmString !== ""
+    );
     console.log("Total PCM strings (filtered): ", filteredPcmStrings.length);
 
     const buffers = filteredPcmStrings.map((pcmString) =>
@@ -82,9 +89,9 @@ export async function POST(req: NextRequest) {
     console.log("Upload responses: ", uploadResponses);
 
     // Save file locally on filesystem for testing purposes
-    console.log("Saving file locally...");
-    const combinedBuffer = Buffer.concat(buffers);
-    await saveWaveFile("test2.wav", combinedBuffer);
+    // console.log("Saving file locally...");
+    // const combinedBuffer = Buffer.concat(buffers);
+    // await saveWaveFile("test2.wav", combinedBuffer);
 
     // Convert PCM to MP3 using trigger.dev
     const pcmFilePaths = uploadResponses.map((response) => response.data?.path);
@@ -96,13 +103,20 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json(handler, { status: 200 });
-  } catch (err: unknown) {
-    console.error(err);
-    return NextResponse.json(
-      { error: "Error generating audio" },
-      { status: 500 }
-    );
+  } catch (err: any) {
+    const parsedError = parseError(err);
+    await logError(parsedError, `API Route - Generate Audio`);
+    return NextResponse.json({ error: parsedError.message }, { status: 500 });
   }
+}
+
+function parseError(err: any) {
+  let errorMessage = "Error generating audio";
+
+  if (err.message.includes("exceeded")) {
+    errorMessage = JSON.parse(err.message).error.message.substring(0, 31);
+  }
+  return new Error(errorMessage);
 }
 
 async function saveWaveFile(
@@ -110,7 +124,7 @@ async function saveWaveFile(
   pcmData: Buffer,
   channels = 1,
   rate = 24000,
-  sampleWidth = 2,
+  sampleWidth = 2
 ) {
   return new Promise((resolve, reject) => {
     const writer = new wav.FileWriter(filename, {
@@ -119,8 +133,8 @@ async function saveWaveFile(
       bitDepth: sampleWidth * 8,
     });
 
-    writer.on('finish', resolve);
-    writer.on('error', reject);
+    writer.on("finish", resolve);
+    writer.on("error", reject);
 
     writer.write(pcmData);
     writer.end();

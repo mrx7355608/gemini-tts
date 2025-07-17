@@ -27,6 +27,7 @@ export default function ErrorLogs() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredLogs, setFilteredLogs] = useState<ErrorLog[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
   const fetchErrorLogs = async () => {
     try {
@@ -43,8 +44,10 @@ export default function ErrorLogs() {
         throw fetchError;
       }
 
-      setErrorLogs(data || []);
-      setFilteredLogs(data || []);
+      const filteredData = data.filter((log) => log.error_message !== null);
+
+      setErrorLogs(filteredData || []);
+      setFilteredLogs(filteredData || []);
     } catch (err: any) {
       console.error("Error fetching error logs:", err);
       setError(err.message || "Failed to fetch error logs");
@@ -58,18 +61,28 @@ export default function ErrorLogs() {
   }, []);
 
   useEffect(() => {
-    if (!searchTerm) {
-      setFilteredLogs(errorLogs);
-    } else {
-      const filtered = errorLogs.filter(
+    let filtered = errorLogs;
+
+    // Filter by category
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter((log) => {
+        const source = parseRaisedBy(log.raised_by).source.toLowerCase();
+        return source.includes(selectedCategory.toLowerCase());
+      });
+    }
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(
         (log) =>
           log.error_message.toLowerCase().includes(searchTerm.toLowerCase()) ||
           log.raised_by.toLowerCase().includes(searchTerm.toLowerCase()) ||
           log.error_description.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setFilteredLogs(filtered);
     }
-  }, [searchTerm, errorLogs]);
+
+    setFilteredLogs(filtered);
+  }, [searchTerm, errorLogs, selectedCategory]);
 
   const truncateText = (text: string, maxLength: number = 100) => {
     if (text.length <= maxLength) return text;
@@ -83,6 +96,22 @@ export default function ErrorLogs() {
       operation: parts[1]?.trim() || "Unknown",
     };
   };
+
+  const getSourceBadgeColor = (source: string) => {
+    const lowerSource = source.toLowerCase();
+    if (lowerSource.includes("supabase")) {
+      return "bg-green-100 text-green-800";
+    }
+    if (lowerSource.includes("api") || lowerSource.includes("route")) {
+      return "bg-blue-100 text-blue-800";
+    }
+    if (lowerSource.includes("trigger")) {
+      return "bg-purple-100 text-purple-800";
+    }
+    return "bg-gray-100 text-gray-800";
+  };
+
+  const categories = ["All", "Supabase", "API Route", "Trigger"];
 
   if (loading) {
     return (
@@ -142,18 +171,35 @@ export default function ErrorLogs() {
           </button>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
+        {/* Search Bar and Filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search error logs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
-          <input
-            type="text"
-            placeholder="Search error logs..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          />
+
+          {/* Category Filter */}
+          <div className="flex-shrink-0">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            >
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category === "All" ? "All Categories" : category}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -279,12 +325,14 @@ export default function ErrorLogs() {
                       </p>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <ExternalLink className="w-4 h-4 text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-900">
-                          {parseRaisedBy(log.raised_by).source}
-                        </span>
-                      </div>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${getSourceBadgeColor(
+                          parseRaisedBy(log.raised_by).source
+                        )}`}
+                      >
+                        <ExternalLink className="w-3 h-3 mr-1" />
+                        {parseRaisedBy(log.raised_by).source}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center">

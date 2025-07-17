@@ -14,6 +14,7 @@ import TaskStatus from "./components/TaskStatus";
 import { validateInputs } from "@/lib/validateInputs";
 import { createClient } from "@/lib/supabase/client";
 import { IHistoryData } from "@/lib/types";
+import { logError } from "@/lib/errorLogger";
 
 export default function HomePage() {
   useAuth();
@@ -84,8 +85,8 @@ export default function HomePage() {
 
       if (!response.ok) {
         setLoading(false);
-        setError("Error generating audio");
-        console.error(await response.json());
+        const error = await response.json();
+        setError(error.error || "Error generating audio");
         setTimeout(() => setError(""), 5000);
         return;
       }
@@ -243,7 +244,11 @@ export default function HomePage() {
               <TaskStatus
                 handleObj={handleObj}
                 handleComplete={onComplete}
-                handleError={console.error}
+                handleError={(errorMessage: string) => {
+                  setError(errorMessage);
+                  setTimeout(() => setError(""), 5000);
+                  setLoading(false);
+                }}
               />
             )}
           </div>
@@ -276,6 +281,7 @@ export default function HomePage() {
     });
 
     if (error) {
+      await logError(error, "Supabase - Add History");
       console.error(error);
       return;
     }

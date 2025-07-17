@@ -26,7 +26,8 @@ export default function TaskStatus({
   }, [run?.status]);
 
   if (error) {
-    return handleError(error.message || "An unknown error occurred");
+    console.log(error);
+    return handleError("An error occurred while converting audio to mp3");
   }
 
   return <></>;
