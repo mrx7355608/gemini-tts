@@ -8,6 +8,7 @@ import {
   ListOrdered,
   User,
   LogOut,
+  Home,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -31,6 +32,11 @@ const adminNavItems = [
     name: "Requests Count",
     href: "/dashboard/requests-count",
     icon: <ListOrdered className="w-5 h-5" />,
+  },
+  {
+    name: "Home",
+    href: "/",
+    icon: <Home className="w-5 h-5" />,
   },
 ];
 

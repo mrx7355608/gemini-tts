@@ -5,7 +5,6 @@ import { Plus, Loader2, Search } from "lucide-react";
 import { UserData } from "@/lib/types";
 import UsersTable from "@/app/components/UsersTable";
 import DeleteConfirmationModal from "@/app/components/DeleteConfirmationModal";
-import { useAuth } from "../../../contexts/AuthContext";
 import CreateUserForm from "@/app/components/CreateUserForm";
 import EditUserForm from "@/app/components/EditUserForm";
 import ChangePasswordModal from "@/app/components/ChangePasswordModal";
@@ -13,7 +12,6 @@ import BlockConfirmationModal from "@/app/components/BlockConfirmationModal";
 import useUsers from "@/app/hooks/useUsers";
 
 export default function Users() {
-  const { user } = useAuth();
   const { users, bannedUsersIDs, loading, error, refreshUsers } = useUsers();
 
   // modals states
@@ -45,16 +43,6 @@ export default function Users() {
     });
     setFilteredUsers(filtered);
   }, [search, users, sortOrder]);
-
-  // if (user?.role !== "admin") {
-  //   return (
-  //     <div className="flex items-center justify-center min-h-screen">
-  //       <div className="text-gray-600 text-2xl font-bold">
-  //         You are not authorized to access this page
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   const openEditModal = (user: UserData) => {
     setSelectedUser(user);

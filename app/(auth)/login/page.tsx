@@ -17,13 +17,17 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     setLoading(false);
     if (error) {
       setError(error.message);
+      return;
+    }
+    if (data.user?.user_metadata.role === "admin") {
+      router.push("/dashboard");
     } else {
       router.push("/");
     }
