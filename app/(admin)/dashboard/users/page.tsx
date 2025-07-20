@@ -87,7 +87,7 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-6 max-w-7xl space-y-6">
       {/* Header */}
       <Card className="border-0 shadow-none mb-0">
         <CardHeader className="pb-4 px-0">
