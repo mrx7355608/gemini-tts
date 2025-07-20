@@ -11,13 +11,14 @@ import {
   Home,
   LayoutDashboard,
   Shield,
-  Activity,
+  Bell,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { createClient } from "@/lib/supabase/client";
 
 const adminNavItems = [
   {
@@ -39,6 +40,12 @@ const adminNavItems = [
     description: "System error tracking",
   },
   {
+    name: "Notifications",
+    href: "/dashboard/notifications",
+    icon: <Bell className="w-5 h-5" />,
+    description: "System notifications",
+  },
+  {
     name: "Analytics",
     href: "/dashboard/analytics",
     icon: <BarChart2 className="w-5 h-5" />,
@@ -58,11 +65,15 @@ const adminNavItems = [
   },
 ];
 
+const supabase = createClient();
+
 export default function AdminSidebar() {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
   const [isHealthy, setIsHealthy] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [isNotificationsLoading, setIsNotificationsLoading] = useState(true);
 
   useEffect(() => {
     const checkHealth = async () => {
@@ -76,7 +87,23 @@ export default function AdminSidebar() {
       }
     };
 
+    const checkNotifications = async () => {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("has_read", false);
+
+      if (error) {
+        console.error("Error fetching notifications:", error);
+      } else {
+        console.log("Notifications fetched:", data);
+        setUnreadNotifications(data.length);
+        setIsNotificationsLoading(false);
+      }
+    };
+
     checkHealth();
+    checkNotifications();
   }, []);
 
   const handleLogout = async () => {
@@ -126,6 +153,11 @@ export default function AdminSidebar() {
                 </div>
                 <div className="flex-1">
                   <div className="font-semibold">{item.name}</div>
+                  {item.name === "Notifications" && !isNotificationsLoading && (
+                    <div className="text-xs text-gray-500">
+                      {unreadNotifications} unread
+                    </div>
+                  )}
                 </div>
               </Link>
             );

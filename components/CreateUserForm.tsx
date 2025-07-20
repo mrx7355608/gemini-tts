@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 
 export default function CreateUserForm({
@@ -23,7 +22,6 @@ export default function CreateUserForm({
   onConfirm: () => void;
 }) {
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
     full_name: "",
     email: "",
@@ -35,7 +33,6 @@ export default function CreateUserForm({
     try {
       e.preventDefault();
       setSubmitting(true);
-      setError(null);
 
       // Validate form data
       if (!formData.email || !formData.password || !formData.full_name) {
@@ -61,11 +58,9 @@ export default function CreateUserForm({
       });
       onConfirm();
     } catch (err: any) {
-      setError(err.message);
       toast.error("Failed to create user", {
         description: err.message,
       });
-      console.error(err);
     } finally {
       setSubmitting(false);
     }
@@ -96,14 +91,6 @@ export default function CreateUserForm({
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {error && (
-            <Alert className="border-red-200 bg-red-50">
-              <AlertDescription className="text-red-700 font-medium">
-                {error}
-              </AlertDescription>
-            </Alert>
-          )}
-
           <form onSubmit={handleCreateUser} className="space-y-4">
             <div className="space-y-2">
               <Label
