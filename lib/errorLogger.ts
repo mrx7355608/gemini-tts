@@ -50,6 +50,19 @@ export async function logError(error: any, raisedBy: string, user_id?: string) {
     } else {
       console.log("Error logged successfully");
     }
+
+    // Add to notification table
+    const [source, operation] = raisedBy.split("-");
+    const { error: err2 } = await supabase.from("notifications").insert({
+      user_id: userId,
+      message: `${source} error occurred while doing ${operation} operation.`,
+      has_read: false,
+    });
+    if (err2) {
+      console.error("Failed to log notification: ", err2.message);
+    } else {
+      console.log("Notification logged successfully");
+    }
   } catch (err: any) {
     console.error("Failed to log error: ", err.message);
   }

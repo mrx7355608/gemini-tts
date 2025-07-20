@@ -8,8 +8,6 @@ import { createClient } from "@/lib/supabase/server";
 import { randomUUID } from "crypto";
 import { logError } from "@/lib/errorLogger";
 
-let modelUsed = null;
-
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
 
@@ -19,16 +17,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
+  // Check if user has api key
   const apiKey = process.env.GEMINI_API_KEY;
-
   if (!apiKey) {
     return NextResponse.json({ error: "API key not found" }, { status: 500 });
   }
 
   const body = await req.json();
   const { text, voice, temperature, model, styleInstructions } = body;
-
-  modelUsed = model.split("-").join(" ").toUpperCase();
 
   // Split prompt into subclips to avoid gemini text limit
   const subclips = splitPrompt(text, 1000);
