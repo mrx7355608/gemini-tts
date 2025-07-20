@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Loader2, Search } from "lucide-react";
+import { Plus, Loader2, Search, Users, Filter } from "lucide-react";
 import { UserData } from "@/lib/types";
 import UsersTable from "@/components/UsersTable";
 import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";
@@ -10,8 +10,19 @@ import EditUserForm from "@/components/EditUserForm";
 import ChangePasswordModal from "@/components/ChangePasswordModal";
 import BlockConfirmationModal from "@/components/BlockConfirmationModal";
 import useUsers from "@/hooks/useUsers";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export default function Users() {
+export default function UsersPage() {
   const { users, bannedUsersIDs, loading, error, refreshUsers } = useUsers();
 
   // modals states
@@ -67,60 +78,137 @@ export default function Users() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
+        <div className="flex items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+          <span className="text-gray-600">Loading users...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto overflow-y-auto">
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            Users
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Manage user accounts and permissions
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="relative w-64">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              <Search className="w-4 h-4" />
-            </span>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search users..."
-              className="pl-9 pr-3 py-2 w-full rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            />
-          </span>
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="py-2 px-3 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-          >
-            <option value="new">Newest</option>
-            <option value="old">Oldest</option>
-          </select>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Create User
-          </button>
-        </div>
-      </div>
+      <Card className="border-0 shadow-none mb-0">
+        <CardHeader className="pb-4 px-0">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Users className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-bold text-gray-900">
+                    User Management
+                  </CardTitle>
+                  <p className="text-gray-600">
+                    Manage user accounts and permissions
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Search and Filter Controls */}
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search users..."
+                    className="pl-10 h-10 w-64 border-gray-200 focus:border-green-500 focus:ring-green-500/20"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Select value={sortOrder} onValueChange={setSortOrder}>
+                    <SelectTrigger className="w-36 h-10 border-gray-200 focus:border-green-500 focus:ring-green-500/20">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="new">Newest First</SelectItem>
+                      <SelectItem value="old">Oldest First</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Create User
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-          {error}
-        </div>
+        <Alert className="border-red-200 bg-red-50/80">
+          <AlertDescription className="text-red-700 font-medium">
+            {error}
+          </AlertDescription>
+        </Alert>
       )}
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="border-0">
+          <CardContent className="p-6 py-0">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Users</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {users.length}
+                </p>
+              </div>
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="w-5 h-5 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0">
+          <CardContent className="p-6 py-0">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Active Users
+                </p>
+                <p className="text-2xl font-bold text-green-600">
+                  {users.length - bannedUsersIDs.length}
+                </p>
+              </div>
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Users className="w-5 h-5 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0">
+          <CardContent className="p-6 py-0">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Blocked Users
+                </p>
+                <p className="text-2xl font-bold text-red-600">
+                  {bannedUsersIDs.length}
+                </p>
+              </div>
+              <div className="p-2 bg-red-100 rounded-lg">
+                <Users className="w-5 h-5 text-red-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Users Table */}
       <UsersTable

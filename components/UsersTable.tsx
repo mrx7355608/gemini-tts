@@ -1,6 +1,34 @@
-import { User, MoreVertical, Edit, Trash2, Ban, Key } from "lucide-react";
+import {
+  User,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Ban,
+  Key,
+  Mail,
+  Calendar,
+} from "lucide-react";
 import { UserData } from "@/lib/types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface UsersTableProps {
   users: UserData[];
@@ -19,138 +47,151 @@ export default function UsersTable({
   onChangePassword,
   bannedUsersIDs,
 }: UsersTableProps) {
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-
-  const handleMenuToggle = (userId: string) => {
-    setOpenMenuId((prev) => (prev === userId ? null : userId));
-  };
-
   return (
-    <>
-      <div className="bg-white rounded-lg shadow h-full">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+    <Card className="border-0 shadow-lg py-0 overflow-hidden">
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
+              <TableHead className="font-semibold text-gray-700">
+                User
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
                 Email
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
                 Role
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
                 Created
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700 text-right">
                 Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {users.map((user) => (
-              <tr
-                key={user.id}
-                className={`hover:bg-gray-50 ${
-                  bannedUsersIDs.includes(user.id) ? "bg-red-100" : "bg-white"
-                }`}
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                        <User className="w-5 h-5 text-gray-600" />
-                      </div>
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {user.full_name}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{user.email}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      user.role === "admin"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-green-100 text-green-800"
-                    }`}
-                  >
-                    {user.role}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(user.created_at).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium relative">
-                  <div className="flex justify-end gap-2">
-                    <button
-                      onClick={() => handleMenuToggle(user.id)}
-                      className="border inline-flex items-center justify-center w-8 h-8 text-gray-400 bg-white rounded-full hover:text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-                    >
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-                    {openMenuId === user.id && (
-                      <>
-                        <div
-                          className="fixed inset-0 z-20"
-                          onClick={() => setOpenMenuId(null)}
-                        />
-                        <div className="absolute right-0 top-8 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 z-20 overflow-hidden">
-                          <div className="py-1">
-                            <button
-                              className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                              onClick={() => {
-                                setOpenMenuId(null);
-                                onEdit(user);
-                              }}
-                            >
-                              <Edit className="w-4 h-4 mr-3 text-gray-400" />
-                              Edit User
-                            </button>
-                            <button
-                              className="flex items-center w-full px-4 py-3 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
-                              onClick={() => onChangePassword(user)}
-                            >
-                              <Key className="w-4 h-4 mr-3 text-blue-500" />
-                              Change Password
-                            </button>
-                            <button
-                              className="flex items-center w-full px-4 py-3 text-sm text-amber-600 hover:bg-amber-50 transition-colors"
-                              onClick={() => onBlock(user)}
-                            >
-                              <Ban className="w-4 h-4 mr-3 text-amber-500" />
-                              {bannedUsersIDs.includes(user.id)
-                                ? "Unblock User"
-                                : "Block User"}
-                            </button>
-                            <div className="border-t border-gray-100" />
-                            <button
-                              className="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                              onClick={() => {
-                                setOpenMenuId(null);
-                                onDelete(user);
-                              }}
-                            >
-                              <Trash2 className="w-4 h-4 mr-3 text-red-500" />
-                              Delete User
-                            </button>
-                          </div>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => {
+              const isBanned = bannedUsersIDs.includes(user.id);
+              return (
+                <TableRow
+                  key={user.id}
+                  className={`hover:bg-gray-50/50 transition-colors ${
+                    isBanned ? "bg-red-50/50" : ""
+                  }`}
+                >
+                  <TableCell>
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback
+                          className={`${
+                            isBanned
+                              ? "bg-red-100 text-red-600"
+                              : "bg-green-100 text-green-600"
+                          }`}
+                        >
+                          <User className="w-5 h-5" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {user.full_name}
                         </div>
-                      </>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+                        {isBanned && (
+                          <div className="text-xs text-red-600 flex items-center gap-1 mt-1">
+                            <Ban className="w-3 h-3" />
+                            Blocked
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-700">{user.email}</span>
+                    </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <Badge
+                      variant={
+                        user.role === "admin" ? "destructive" : "default"
+                      }
+                      className={`${
+                        user.role === "admin"
+                          ? "bg-red-100 text-red-700 border-red-200"
+                          : "bg-green-100 text-green-700 border-green-200"
+                      }`}
+                    >
+                      {user.role}
+                    </Badge>
+                  </TableCell>
+
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-700">
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </TableCell>
+
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-gray-100"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem
+                          onClick={() => onEdit(user)}
+                          className="cursor-pointer"
+                        >
+                          <Edit className="w-4 h-4 mr-2 text-gray-500" />
+                          Edit User
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() => onChangePassword(user)}
+                          className="cursor-pointer"
+                        >
+                          <Key className="w-4 h-4 mr-2" />
+                          Change Password
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() => onBlock(user)}
+                          className="cursor-pointer"
+                        >
+                          <Ban className="w-4 h-4 mr-2" />
+                          {isBanned ? "Unblock User" : "Block User"}
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                          onClick={() => onDelete(user)}
+                          className="cursor-pointer text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete User
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }

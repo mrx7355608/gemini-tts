@@ -84,7 +84,7 @@ export default function AdminSidebar() {
   };
 
   return (
-    <div className="w-72 bg-gradient-to-b from-white to-gray-50/50 border-r border-gray-200/50 h-screen flex flex-col backdrop-blur-sm">
+    <div className="w-72 bg-gradient-to-b from-white to-gray-50/50 border-r border-gray-200/50 flex flex-col backdrop-blur-sm">
       {/* Logo/Brand */}
       <div className="p-6 border-b border-gray-200/50">
         <div className="flex items-center space-x-3">

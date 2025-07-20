@@ -11,8 +11,11 @@ export default function useUsers() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchUsers();
-    fetchBannedUsers();
+    const fetchData = async () => {
+      await Promise.all([fetchUsers(), fetchBannedUsers()]);
+    };
+
+    fetchData();
   }, []);
 
   const fetchUsers = async () => {
