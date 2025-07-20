@@ -2,30 +2,52 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import ProtectedRoute from "../components/ProtectedRoute";
+import ProtectedRoute from "../../components/ProtectedRoute";
 
 const supabase = createClient();
 
-export default function LoginPage() {
+export default function SignupPage() {
+  const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const { error } = await supabase.auth.signInWithPassword({
+
+    // Signup user
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: fullname,
+        },
+      },
     });
+
+    // Create user profile
+    const { error: error2 } = await supabase.from("user_profile").insert([
+      {
+        id: data.user?.id,
+        full_name: fullname,
+        email: email,
+      },
+    ]);
+    if (error2) {
+      setError(error2.message);
+    }
+
     setLoading(false);
+
     if (error) {
       setError(error.message);
     } else {
-      router.push("/");
+      router.push("/login");
     }
   };
 
@@ -34,18 +56,31 @@ export default function LoginPage() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-white p-4">
         <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-xl w-full max-w-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
           <h1 className="text-3xl font-bold text-green-500 text-center mb-2 tracking-tight">
-            Welcome Back
+            Create Account
           </h1>
           <p className="text-gray-500 text-center mb-8 text-sm">
-            Sign in to your account to continue
+            Join us and start your journey today
           </p>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            {error && (
-              <div className="text-red-500 text-sm p-3 bg-red-50 border border-red-200 rounded-lg">
-                {error}
-              </div>
-            )}
+          <form onSubmit={handleSignup} className="space-y-6">
+            <div>
+              <label
+                htmlFor="fullname"
+                className="block text-gray-700 font-medium mb-2 text-sm"
+              >
+                Full Name
+              </label>
+              <input
+                id="fullname"
+                type="text"
+                placeholder="Enter your full name"
+                value={fullname}
+                onChange={(e) => setFullname(e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm transition-all duration-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white outline-none"
+              />
+            </div>
+
             <div>
               <label
                 htmlFor="email"
@@ -74,13 +109,19 @@ export default function LoginPage() {
               <input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Create a strong password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-sm transition-all duration-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white outline-none"
               />
             </div>
+
+            {error && (
+              <div className="text-red-500 text-sm p-3 bg-red-50 border border-red-200 rounded-lg">
+                {error}
+              </div>
+            )}
 
             <button
               type="submit"
@@ -109,21 +150,21 @@ export default function LoginPage() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Signing in...
+                  Creating account...
                 </>
               ) : (
-                "Sign In"
+                "Create Account"
               )}
             </button>
           </form>
 
           <div className="mt-6 text-center text-gray-500 text-sm">
-            Don&apos;t have an account?{" "}
+            Already have an account?{" "}
             <a
-              href="/signup"
+              href="/login"
               className="text-green-500 font-medium hover:text-green-600 hover:underline transition-colors"
             >
-              Create one
+              Sign in
             </a>
           </div>
         </div>

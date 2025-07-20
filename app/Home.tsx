@@ -1,13 +1,20 @@
 "use client";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/AuthContext";
-import { Mic2, Download, PlayCircle, Loader2 } from "lucide-react";
+import {
+  Mic2,
+  Download,
+  PlayCircle,
+  Loader2,
+  AlertTriangle,
+} from "lucide-react";
 import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import TaskStatus from "./components/TaskStatus";
 import { validateInputs } from "@/lib/validateInputs";
 import { createClient } from "@/lib/supabase/client";
 import { IHistoryData } from "@/lib/types";
+import { logError } from "@/lib/errorLogger";
 
 export default function HomePage() {
   useAuth();
@@ -78,8 +85,8 @@ export default function HomePage() {
 
       if (!response.ok) {
         setLoading(false);
-        setError("Error generating audio");
-        console.error(await response.json());
+        const error = await response.json();
+        setError(error.error || "Error generating audio");
         setTimeout(() => setError(""), 5000);
         return;
       }
@@ -170,12 +177,21 @@ export default function HomePage() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
               />
-              <div className="flex justify-end mt-2">
-                <span
-                  className={`text-sm ${
-                    text.length > 30000 ? "text-red-500" : "text-gray-500"
-                  }`}
-                >
+              <div className="flex justify-between mt-2">
+                {text.length > 30000 ? (
+                  <span className="text-sm text-red-500 font-medium">
+                    <AlertTriangle className="inline w-4 h-4 mr-2 text-red-500" />
+                    You are generating 30+ minutes of audio.
+                  </span>
+                ) : text.length > 20000 ? (
+                  <span className="text-sm text-yellow-600 font-medium">
+                    <AlertTriangle className="inline w-4 h-4 mr-1" />
+                    You are generating 20+ minutes of audio.
+                  </span>
+                ) : (
+                  <div></div>
+                )}
+                <span className="text-sm text-gray-500">
                   {text.length}/30,000 characters
                 </span>
               </div>
@@ -228,7 +244,11 @@ export default function HomePage() {
               <TaskStatus
                 handleObj={handleObj}
                 handleComplete={onComplete}
-                handleError={console.error}
+                handleError={(errorMessage: string) => {
+                  setError(errorMessage);
+                  setTimeout(() => setError(""), 5000);
+                  setLoading(false);
+                }}
               />
             )}
           </div>
@@ -261,6 +281,7 @@ export default function HomePage() {
     });
 
     if (error) {
+      await logError(error, "Supabase - Add History");
       console.error(error);
       return;
     }
