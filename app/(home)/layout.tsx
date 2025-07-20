@@ -1,4 +1,4 @@
-import HomeNavigationSidebar from "../components/HomeNavigationSidebar";
+import HomeNavigationSidebar from "../../components/HomeNavigationSidebar";
 
 export default function HomeLayout({
   children,

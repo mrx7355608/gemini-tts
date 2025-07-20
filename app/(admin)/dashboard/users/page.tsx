@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { Plus, Loader2, Search } from "lucide-react";
 import { UserData } from "@/lib/types";
-import UsersTable from "@/app/components/UsersTable";
-import DeleteConfirmationModal from "@/app/components/DeleteConfirmationModal";
-import CreateUserForm from "@/app/components/CreateUserForm";
-import EditUserForm from "@/app/components/EditUserForm";
-import ChangePasswordModal from "@/app/components/ChangePasswordModal";
-import BlockConfirmationModal from "@/app/components/BlockConfirmationModal";
-import useUsers from "@/app/hooks/useUsers";
+import UsersTable from "@/components/UsersTable";
+import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";
+import CreateUserForm from "@/components/CreateUserForm";
+import EditUserForm from "@/components/EditUserForm";
+import ChangePasswordModal from "@/components/ChangePasswordModal";
+import BlockConfirmationModal from "@/components/BlockConfirmationModal";
+import useUsers from "@/hooks/useUsers";
 
 export default function Users() {
   const { users, bannedUsersIDs, loading, error, refreshUsers } = useUsers();

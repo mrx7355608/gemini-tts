@@ -1,6 +1,6 @@
 "use client";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuth } from "./contexts/AuthContext";
+import ProtectedRoute from "../components/ProtectedRoute";
+import { useAuth } from "../contexts/AuthContext";
 import {
   Mic2,
   Download,
@@ -9,8 +9,8 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { useState } from "react";
-import Sidebar from "./components/Sidebar";
-import TaskStatus from "./components/TaskStatus";
+import Sidebar from "../components/Sidebar";
+import TaskStatus from "../components/TaskStatus";
 import { validateInputs } from "@/lib/validateInputs";
 import { createClient } from "@/lib/supabase/client";
 import { IHistoryData } from "@/lib/types";
