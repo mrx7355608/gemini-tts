@@ -55,7 +55,9 @@ export async function logError(error: any, raisedBy: string, user_id?: string) {
     const [source, operation] = raisedBy.split("-");
     const { error: err2 } = await supabase.from("notifications").insert({
       user_id: userId,
-      message: `${source} error occurred while doing ${operation} operation.`,
+      message: `${
+        source.split(" ")[0]
+      } error occurred while doing ${operation} operation.`,
       has_read: false,
     });
     if (err2) {

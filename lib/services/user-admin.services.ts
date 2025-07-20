@@ -150,101 +150,15 @@ export default function UserAdminServices() {
     return bannedUsers;
   }
 
-  // #######################################
-  //         Error Logging Functions
-  // #######################################
-  const createUserWithErrorLogging = async (
-    full_name: string,
-    email: string,
-    password: string,
-    role: string
-  ) => {
-    return await errorLogger({
-      raisedBy: "Supabase - Create User",
-      executionFunc: createUser,
-      args: [full_name, email, password, role],
-    });
-  };
-
-  const updateUserEmailWithErrorLogging = async (id: string, email: string) => {
-    return await errorLogger({
-      raisedBy: "Supabase - Update User Email",
-      executionFunc: updateUserEmail,
-      args: [id, email],
-    });
-  };
-
-  const updateUserFullNameWithErrorLogging = async (
-    id: string,
-    full_name: string
-  ) => {
-    return await errorLogger({
-      raisedBy: "Supabase - Update Full Name",
-      executionFunc: updateUserFullName,
-      args: [id, full_name],
-    });
-  };
-
-  const updateUserRoleWithErrorLogging = async (id: string, role: string) => {
-    return await errorLogger({
-      raisedBy: "Supabase - Update Role",
-      executionFunc: updateUserRole,
-      args: [id, role],
-    });
-  };
-
-  const deleteUserWithErrorLogging = async (id: string) => {
-    return await errorLogger({
-      raisedBy: "Supabase - Delete User",
-      executionFunc: deleteUser,
-      args: [id],
-    });
-  };
-
-  const banUserWithErrorLogging = async (id: string) => {
-    return await errorLogger({
-      raisedBy: "Supabase - Ban User",
-      executionFunc: banUser,
-      args: [id],
-    });
-  };
-
-  const unbanUserWithErrorLogging = async (id: string) => {
-    return await errorLogger({
-      raisedBy: "Supabase - Unban User",
-      executionFunc: unbanUser,
-      args: [id],
-    });
-  };
-
-  const getBannedUsersIDsWithErrorLogging = async () => {
-    return await errorLogger({
-      raisedBy: "Supabase - Get Banned Users IDs",
-      executionFunc: getBannedUsersIDs,
-      args: [],
-    });
-  };
-
-  const updateUserPasswordWithErrorLogging = async (
-    id: string,
-    password: string
-  ) => {
-    return await errorLogger({
-      raisedBy: "Supabase - Update Password",
-      executionFunc: updateUserPassword,
-      args: [id, password],
-    });
-  };
-
   return {
-    createUser: createUserWithErrorLogging,
-    updateUserEmail: updateUserEmailWithErrorLogging,
-    updateUserFullName: updateUserFullNameWithErrorLogging,
-    updateUserRole: updateUserRoleWithErrorLogging,
-    deleteUser: deleteUserWithErrorLogging,
-    banUser: banUserWithErrorLogging,
-    unbanUser: unbanUserWithErrorLogging,
-    updateUserPassword: updateUserPasswordWithErrorLogging,
-    getBannedUsersIDs: getBannedUsersIDsWithErrorLogging,
+    createUser,
+    updateUserEmail,
+    updateUserFullName,
+    updateUserRole,
+    deleteUser,
+    banUser,
+    unbanUser,
+    updateUserPassword,
+    getBannedUsersIDs,
   };
 }

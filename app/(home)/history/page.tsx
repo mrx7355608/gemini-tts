@@ -1,7 +1,7 @@
 import { getHistory } from "@/lib/history-services";
 import { Clock, Mic, Settings } from "lucide-react";
 import { HistoryItem } from "@/lib/types";
-import HistoryTable from "../../components/HistoryTable";
+import HistoryTable from "../../../components/HistoryTable";
 
 export default async function HistoryPage() {
   const history = await getHistory();
