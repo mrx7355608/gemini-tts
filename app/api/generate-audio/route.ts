@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
     );
 
     // Update user requests usage
-    await updateUsage(data.user.id, model);
+    await updateUsage(data.user.id, model, subclips.length);
 
     return NextResponse.json(handler, { status: 200 });
   } catch (err: any) {
