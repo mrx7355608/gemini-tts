@@ -32,6 +32,7 @@ export async function logError(error: any, raisedBy: string, user_id?: string) {
 
     if (!user_id) {
       const { data } = await supabase.auth.getUser();
+      // console.log("User ID: ", data.user?.id);
       userId = data.user?.id;
     }
 

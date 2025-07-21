@@ -7,6 +7,7 @@ import wav from "wav";
 import { createClient } from "@/lib/supabase/server";
 import { randomUUID } from "crypto";
 import { logError } from "@/lib/errorLogger";
+import { updateUsage } from "@/lib/services/usage.services";
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -106,8 +107,12 @@ export async function POST(req: NextRequest) {
       }
     );
 
+    // Update user requests usage
+    await updateUsage(data.user.id, model);
+
     return NextResponse.json(handler, { status: 200 });
   } catch (err: any) {
+    console.log("Error generating audio: ", err.message);
     const parsedError = parseError(err);
     await logError(parsedError, `API Error - Generate Audio`);
     return NextResponse.json({ error: parsedError.message }, { status: 500 });
