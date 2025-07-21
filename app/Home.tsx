@@ -44,6 +44,7 @@ export default function HomePage() {
     "gemini-2.5-flash-preview-tts"
   );
   const [error, setError] = useState("");
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleRun = async () => {
     try {
@@ -111,6 +112,7 @@ export default function HomePage() {
   };
 
   function downloadFileFromUrl() {
+    setIsDownloading(true);
     fetch(audioURL)
       .then((res) => res.blob())
       .then((blob) => {
@@ -120,6 +122,7 @@ export default function HomePage() {
         a.download = "gemini_tts.mp3";
         a.click();
         URL.revokeObjectURL(blobUrl);
+        setIsDownloading(false);
       });
   }
 
@@ -225,7 +228,7 @@ export default function HomePage() {
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="flex-1 min-w-0">
                         <audio
-                          className="w-full h-12 rounded-lg bg-white shadow-sm"
+                          className="w-full rounded-lg bg-white shadow-sm"
                           controls
                           autoPlay
                         >
@@ -233,13 +236,18 @@ export default function HomePage() {
                         </audio>
                       </div>
                       <Button
-                        variant="outline"
                         size="sm"
+                        variant="outline"
+                        disabled={isDownloading}
                         onClick={downloadFileFromUrl}
-                        className="shrink-0 bg-white hover:bg-gray-50 border-green-200 text-green-700 hover:text-green-800 transition-all duration-200"
+                        className="cursor-pointer shrink-0"
                       >
-                        <Download className="w-4 h-4 mr-2" />
-                        Download
+                        {isDownloading ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <Download className="w-4 h-4 mr-2" />
+                        )}
+                        {isDownloading ? "Downloading..." : "Download"}
                       </Button>
                     </div>
                   </div>
