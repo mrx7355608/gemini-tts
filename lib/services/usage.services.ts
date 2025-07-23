@@ -7,12 +7,22 @@ export async function updateUsage(
 ) {
   const supabase = await createClient();
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const isoToday = today.toISOString();
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const isoTomorrow = tomorrow.toISOString();
+
   // Get existing usage record
   const { data, error } = await supabase
     .from("usage")
     .select("*")
     .eq("user_id", userId)
     .eq("model_name", model)
+    .gte("created_at", isoToday)
+    .lt("created_at", isoTomorrow)
     .maybeSingle();
 
   if (error) {

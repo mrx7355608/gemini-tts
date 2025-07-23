@@ -7,9 +7,11 @@ import {
   Key,
   Mail,
   Calendar,
+  CheckCircle,
+  XCircle,
+  Eye,
 } from "lucide-react";
 import { UserData } from "@/lib/types";
-import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -36,6 +38,7 @@ interface UsersTableProps {
   onDelete: (user: UserData) => void;
   onBlock: (user: UserData) => void;
   onChangePassword: (user: UserData) => void;
+  onViewDetails: (user: UserData) => void;
   bannedUsersIDs: string[];
 }
 
@@ -45,15 +48,16 @@ export default function UsersTable({
   onDelete,
   onBlock,
   onChangePassword,
+  onViewDetails,
   bannedUsersIDs,
 }: UsersTableProps) {
   return (
-    <Card className="border-0 shadow-lg py-0 overflow-hidden">
+    <Card className="border border-gray-300 shadow-none py-0 overflow-hidden">
       <CardContent className="p-0">
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
-              <TableHead className="font-semibold text-gray-700">
+              <TableHead className="font-semibold text-gray-700 pl-5">
                 User
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
@@ -63,9 +67,12 @@ export default function UsersTable({
                 Role
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
+                Status
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
                 Created
               </TableHead>
-              <TableHead className="font-semibold text-gray-700 text-right">
+              <TableHead className="font-semibold text-gray-700 text-right pr-5">
                 Actions
               </TableHead>
             </TableRow>
@@ -80,7 +87,7 @@ export default function UsersTable({
                     isBanned ? "bg-red-50/50" : ""
                   }`}
                 >
-                  <TableCell>
+                  <TableCell className="pl-4">
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-10 w-10">
                         <AvatarFallback
@@ -97,12 +104,6 @@ export default function UsersTable({
                         <div className="font-medium text-gray-900">
                           {user.full_name}
                         </div>
-                        {isBanned && (
-                          <div className="text-xs text-red-600 flex items-center gap-1 mt-1">
-                            <Ban className="w-3 h-3" />
-                            Blocked
-                          </div>
-                        )}
                       </div>
                     </div>
                   </TableCell>
@@ -115,17 +116,31 @@ export default function UsersTable({
                   </TableCell>
 
                   <TableCell>
+                    <span className="text-gray-700 capitalize">
+                      {user.role}
+                    </span>
+                  </TableCell>
+
+                  <TableCell>
                     <Badge
-                      variant={
-                        user.role === "admin" ? "destructive" : "default"
-                      }
-                      className={`${
-                        user.role === "admin"
+                      variant={isBanned ? "destructive" : "secondary"}
+                      className={`text-xs ${
+                        isBanned
                           ? "bg-red-100 text-red-700 border-red-200"
                           : "bg-green-100 text-green-700 border-green-200"
                       }`}
                     >
-                      {user.role}
+                      {isBanned ? (
+                        <>
+                          <XCircle className="w-3 h-3 mr-1" />
+                          Blocked
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Active
+                        </>
+                      )}
                     </Badge>
                   </TableCell>
 
@@ -138,7 +153,7 @@ export default function UsersTable({
                     </div>
                   </TableCell>
 
-                  <TableCell className="text-right">
+                  <TableCell className="text-right pr-4">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
@@ -150,6 +165,16 @@ export default function UsersTable({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem
+                          onClick={() => onViewDetails(user)}
+                          className="cursor-pointer"
+                        >
+                          <Eye className="w-4 h-4 mr-2 text-green-600" />
+                          View Details
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+
                         <DropdownMenuItem
                           onClick={() => onEdit(user)}
                           className="cursor-pointer"

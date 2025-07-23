@@ -65,6 +65,7 @@ export default function useAnalytics(timeRange: string) {
         return;
       }
 
+      console.log("rawUsageData", rawUsageData);
       const data = rawUsageData.map((item) => {
         return {
           ...item,
@@ -104,11 +105,14 @@ export default function useAnalytics(timeRange: string) {
       dailyMap[dateKey] = 0;
     }
 
-    // Aggregate data by day
+    // Aggregate requests by day
     data.forEach((item) => {
-      const date = new Date(item.created_at).toISOString().split("T")[0];
-      if (dailyMap.hasOwnProperty(date)) {
-        dailyMap[date] += item.requests_used;
+      const itemDate = new Date(item.created_at);
+      const dateKey = itemDate.toISOString().split("T")[0];
+
+      // Only include dates within our 7-day window
+      if (dailyMap.hasOwnProperty(dateKey)) {
+        dailyMap[dateKey] += item.requests_used;
       }
     });
 

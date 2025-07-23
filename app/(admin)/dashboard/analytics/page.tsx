@@ -39,6 +39,7 @@ import {
 import useAnalytics from "@/hooks/use-analytics";
 import Spinner from "@/components/Spinner";
 import UserConsumptionTable from "@/components/UserConsumptionTable";
+import AdminNavbar from "@/components/AdminNavbar";
 
 export default function Analytics() {
   const [timeRange, setTimeRange] = useState("30");
@@ -49,10 +50,13 @@ export default function Analytics() {
     userConsumption,
     modelUsage,
     loading,
-    totalRequests,
-    totalUsers,
-    mostActiveUser,
   } = useAnalytics(timeRange);
+
+  // Light green color shades for pie chart (2 models)
+  const GREEN_SHADES = [
+    "#34d399", // emerald-300
+    "#6ee7b7", // emerald-200
+  ];
 
   const truncate = (text: string, maxLength: number) => {
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
@@ -66,6 +70,7 @@ export default function Analytics() {
 
   return (
     <div className="p-6 space-y-8">
+      <AdminNavbar />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -90,7 +95,7 @@ export default function Analytics() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="border-0 shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -165,12 +170,12 @@ export default function Analytics() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-6">
         {/* Daily Usage */}
-        <Card className="border-0 shadow-sm">
+        <Card className="border border-gray-300 shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5" />
@@ -190,8 +195,8 @@ export default function Analytics() {
                 <Area
                   type="monotone"
                   dataKey="requests"
-                  stroke="#3B82F6"
-                  fill="#3B82F6"
+                  stroke="#10B981"
+                  fill="#10B981"
                   fillOpacity={0.3}
                 />
               </AreaChart>
@@ -200,7 +205,7 @@ export default function Analytics() {
         </Card>
 
         {/* Weekly Usage */}
-        <Card className="border-0 shadow-sm">
+        <Card className="border border-gray-300 shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5" />
@@ -223,7 +228,7 @@ export default function Analytics() {
         </Card>
 
         {/* Monthly Usage */}
-        <Card className="border-0 shadow-sm">
+        <Card className="border border-gray-300 shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
@@ -242,9 +247,9 @@ export default function Analytics() {
                 <Line
                   type="monotone"
                   dataKey="requests"
-                  stroke="#F59E0B"
+                  stroke="#10B981"
                   strokeWidth={3}
-                  dot={{ fill: "#F59E0B", strokeWidth: 2, r: 6 }}
+                  dot={{ fill: "#10B981", strokeWidth: 2, r: 6 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -252,7 +257,7 @@ export default function Analytics() {
         </Card>
 
         {/* Model Usage Distribution */}
-        <Card className="border-0 shadow-sm">
+        <Card className="border border-gray-300 shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="w-5 h-5" />
@@ -272,11 +277,14 @@ export default function Analytics() {
                       `${model_name} ${percentage.toFixed(1)}%`
                     }
                     outerRadius={80}
-                    fill="#8884d8"
+                    fill="#10B981"
                     dataKey="requests"
                   >
                     {modelUsage.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={GREEN_SHADES[index % GREEN_SHADES.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip
@@ -294,7 +302,7 @@ export default function Analytics() {
       </div>
 
       {/* User Consumption Table */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border border-gray-300 shadow-none">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">

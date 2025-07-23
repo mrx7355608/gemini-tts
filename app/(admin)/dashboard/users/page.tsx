@@ -22,6 +22,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Spinner from "@/components/Spinner";
+import AdminNavbar from "@/components/AdminNavbar";
+import UserDetailsDrawer from "@/components/UserDetailsDrawer";
 
 export default function UsersPage() {
   const { users, bannedUsersIDs, loading, error, refreshUsers } = useUsers();
@@ -34,13 +36,22 @@ export default function UsersPage() {
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
 
+  // drawer states
+  const [showUserDrawer, setShowUserDrawer] = useState(false);
+  const [selectedUserForDrawer, setSelectedUserForDrawer] =
+    useState<UserData | null>(null);
+
   // search and sort states
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState("new");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
 
   useEffect(() => {
     let filtered = users;
+
+    // Apply search filter
     if (search) {
       filtered = filtered.filter(
         (u) =>
@@ -48,13 +59,29 @@ export default function UsersPage() {
           u.email?.toLowerCase().includes(search.toLowerCase())
       );
     }
+
+    // Apply role filter
+    if (roleFilter !== "all") {
+      filtered = filtered.filter((u) => u.role === roleFilter);
+    }
+
+    // Apply status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((u) => {
+        const isBlocked = bannedUsersIDs.includes(u.id);
+        return statusFilter === "blocked" ? isBlocked : !isBlocked;
+      });
+    }
+
+    // Apply sort
     filtered = filtered.slice().sort((a, b) => {
       const dateA = new Date(a.created_at).getTime();
       const dateB = new Date(b.created_at).getTime();
       return sortOrder === "new" ? dateB - dateA : dateA - dateB;
     });
+
     setFilteredUsers(filtered);
-  }, [search, users, sortOrder]);
+  }, [search, users, sortOrder, roleFilter, statusFilter, bannedUsersIDs]);
 
   const openEditModal = (user: UserData) => {
     setSelectedUser(user);
@@ -76,66 +103,38 @@ export default function UsersPage() {
     setShowBlockModal(true);
   };
 
+  const openUserDrawer = (user: UserData) => {
+    setSelectedUserForDrawer(user);
+    setShowUserDrawer(true);
+  };
+
   if (loading) {
     return <Spinner message="Please wait while we fetch users data..." />;
   }
 
   return (
-    <div className="p-6 max-w-7xl space-y-6">
+    <div className="p-6 pt-2 pb-6 max-w-7xl space-y-6">
+      <AdminNavbar />
       {/* Header */}
       <Card className="border-0 shadow-none mb-0">
         <CardHeader className="pb-4 px-0">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Users className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl font-bold text-gray-900">
-                    User Management
-                  </CardTitle>
-                  <p className="text-gray-600">
-                    Manage user accounts and permissions
-                  </p>
-                </div>
-              </div>
+              <CardTitle className="text-2xl font-bold text-gray-900">
+                User Management
+              </CardTitle>
+              <p className="text-gray-600 mt-1">
+                Manage user accounts, roles, and permissions
+              </p>
             </div>
 
-            {/* Search and Filter Controls */}
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search users..."
-                    className="pl-10 h-10 w-64 border-gray-200 focus:border-green-500 focus:ring-green-500/20"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Select value={sortOrder} onValueChange={setSortOrder}>
-                    <SelectTrigger className="w-36 h-10 border-gray-200 focus:border-green-500 focus:ring-green-500/20">
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="new">Newest First</SelectItem>
-                      <SelectItem value="old">Oldest First</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <Button
-                onClick={() => setShowCreateModal(true)}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Create User
-              </Button>
-            </div>
+            <Button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Create User
+            </Button>
           </div>
         </CardHeader>
       </Card>
@@ -149,60 +148,59 @@ export default function UsersPage() {
         </Alert>
       )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-0">
-          <CardContent className="p-6 py-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Users</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {users.length}
-                </p>
-              </div>
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="w-5 h-5 text-blue-600" />
-              </div>
+      {/* Search and Filter Controls */}
+      <Card className="border-none py-0 shadow-none">
+        <CardContent className="p-0">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search users by name or email..."
+                className="pl-10 h-10 border-gray-200 focus:border-green-500 focus:ring-green-500/20"
+              />
             </div>
-          </CardContent>
-        </Card>
 
-        <Card className="border-0">
-          <CardContent className="p-6 py-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Active Users
-                </p>
-                <p className="text-2xl font-bold text-green-600">
-                  {users.length - bannedUsersIDs.length}
-                </p>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger className="w-32 h-10 border-gray-200 focus:border-green-500 focus:ring-green-500/20">
+                    <SelectValue placeholder="Role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Roles</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="user">User</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Users className="w-5 h-5 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card className="border-0">
-          <CardContent className="p-6 py-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Blocked Users
-                </p>
-                <p className="text-2xl font-bold text-red-600">
-                  {bannedUsersIDs.length}
-                </p>
-              </div>
-              <div className="p-2 bg-red-100 rounded-lg">
-                <Users className="w-5 h-5 text-red-600" />
-              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-36 h-10 border-gray-200 focus:border-green-500 focus:ring-green-500/20">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="blocked">Blocked</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={sortOrder} onValueChange={setSortOrder}>
+                <SelectTrigger className="w-36 h-10 border-gray-200 focus:border-green-500 focus:ring-green-500/20">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new">Newest First</SelectItem>
+                  <SelectItem value="old">Oldest First</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Users Table */}
       <UsersTable
@@ -211,6 +209,7 @@ export default function UsersPage() {
         onDelete={openDeleteModal}
         onBlock={openBlockModal}
         onChangePassword={openChangePasswordModal}
+        onViewDetails={openUserDrawer}
         bannedUsersIDs={bannedUsersIDs}
       />
 
@@ -291,6 +290,16 @@ export default function UsersPage() {
             setSelectedUser(null);
           }}
           isBlocked={bannedUsersIDs.includes(selectedUser?.id || "")}
+        />
+      )}
+
+      {/* User Details Drawer */}
+      {selectedUserForDrawer && (
+        <UserDetailsDrawer
+          selectedUser={selectedUserForDrawer}
+          isDrawerOpen={showUserDrawer}
+          setIsDrawerOpen={setShowUserDrawer}
+          isBlocked={bannedUsersIDs.includes(selectedUserForDrawer?.id || "")}
         />
       )}
     </div>

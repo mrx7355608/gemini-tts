@@ -29,6 +29,7 @@ import { Badge } from "@/components/ui/badge";
 // Progress component created inline
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Spinner from "@/components/Spinner";
+import AdminNavbar from "@/components/AdminNavbar";
 
 interface ModelUsage {
   model_name: string;
@@ -54,9 +55,9 @@ interface RecentUsage {
 const SYSTEM_LIMIT = 1000;
 
 const MODEL_COLORS = {
-  "gemini-tts-2.5-flash": "#3B82F6",
-  "gemini-tts-2.5-pro": "#10B981",
-  default: "#6B7280",
+  "gemini-tts-2.5-flash": "#10b981", // emerald-500
+  "gemini-tts-2.5-pro": "#6ee7b7", // emerald-200
+  default: "#34d399", // emerald-300
 };
 
 const MODEL_DISPLAY_NAMES = {
@@ -110,14 +111,26 @@ export default function RequestCount() {
       });
 
       const modelBreakdown = Object.entries(modelMap).map(
-        ([model, requests]) => ({
-          model_name: model,
-          total_requests: requests,
-          percentage: totalUsed > 0 ? (requests / totalUsed) * 100 : 0,
-          color:
-            MODEL_COLORS[model as keyof typeof MODEL_COLORS] ||
-            MODEL_COLORS.default,
-        })
+        ([model, requests], index) => {
+          // Log the model name for debugging
+          console.log("Model name:", model);
+
+          // Get color by exact match or use alternating emerald colors for 2 models
+          let color;
+          if (MODEL_COLORS[model as keyof typeof MODEL_COLORS]) {
+            color = MODEL_COLORS[model as keyof typeof MODEL_COLORS];
+          } else {
+            // Use alternating emerald colors if exact match not found
+            color = index === 0 ? "#10b981" : "#6ee7b7"; // emerald-500 and emerald-200
+          }
+
+          return {
+            model_name: model,
+            total_requests: requests,
+            percentage: totalUsed > 0 ? (requests / totalUsed) * 100 : 0,
+            color: color,
+          };
+        }
       );
 
       // Process recent usage (last 7 days)
@@ -214,6 +227,7 @@ export default function RequestCount() {
 
   return (
     <div className="p-6 space-y-8">
+      <AdminNavbar />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -277,7 +291,7 @@ export default function RequestCount() {
       {/* Main Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Total Used */}
-        <Card className="border-0 shadow-sm">
+        <Card className="border border-gray-300 shadow-sm py-2">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -290,9 +304,6 @@ export default function RequestCount() {
                   )}`}
                 >
                   {stats.totalUsed.toLocaleString()}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {stats.usagePercentage.toFixed(1)}% of limit
                 </p>
               </div>
               <div
@@ -325,7 +336,7 @@ export default function RequestCount() {
         </Card>
 
         {/* Remaining */}
-        <Card className="border-0 shadow-sm">
+        <Card className="border border-gray-300 shadow-sm py-1">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -367,7 +378,7 @@ export default function RequestCount() {
         </Card>
 
         {/* System Limit */}
-        <Card className="border-0 shadow-sm">
+        <Card className="border border-gray-300 shadow-sm py-1">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -390,7 +401,7 @@ export default function RequestCount() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Model Breakdown */}
-        <Card className="border-0 shadow-sm">
+        <Card className="border border-gray-300 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5" />
@@ -478,7 +489,7 @@ export default function RequestCount() {
         </Card>
 
         {/* Recent Usage Trend */}
-        <Card className="border-0 shadow-sm">
+        <Card className="border border-gray-300 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
@@ -495,7 +506,7 @@ export default function RequestCount() {
                   formatter={(value) => [`${value} requests`, "Requests"]}
                   labelFormatter={(label) => `Date: ${label}`}
                 />
-                <Bar dataKey="requests" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="requests" fill="#10B981" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
 
@@ -521,43 +532,6 @@ export default function RequestCount() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Usage Summary */}
-      <Card className="border-0 shadow-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            Usage Summary
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">
-                {stats.totalUsed}
-              </p>
-              <p className="text-sm text-blue-700">Total Requests Used</p>
-            </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <p className="text-2xl font-bold text-green-600">
-                {stats.remaining}
-              </p>
-              <p className="text-sm text-green-700">Requests Remaining</p>
-            </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <p className="text-2xl font-bold text-purple-600">
-                {stats.totalUsed > 0
-                  ? Math.round(
-                      recentUsage.reduce((sum, day) => sum + day.requests, 0) /
-                        7
-                    )
-                  : 0}
-              </p>
-              <p className="text-sm text-purple-700">Daily Average (7 days)</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

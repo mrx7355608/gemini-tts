@@ -34,25 +34,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import useErrorLogs from "@/hooks/use-error-logs";
 import Spinner from "@/components/Spinner";
 import ErrorLogsTable from "@/components/ErrorLogsTable";
 import ErrorDrawer from "@/components/ErrorDrawer";
+import AdminNavbar from "@/components/AdminNavbar";
 
 interface ErrorLog {
   id: string;
@@ -156,6 +142,8 @@ export default function ErrorLogs() {
 
   return (
     <div className="p-6 space-y-6">
+      <AdminNavbar />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -171,23 +159,14 @@ export default function ErrorLogs() {
       </div>
 
       {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="w-5 h-5" />
-            Search & Filter
-          </CardTitle>
-          <CardDescription>
-            Search through error logs and filter by category
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+      <Card className="border-none py-0 shadow-none">
+        <CardContent className="space-y-4 mt-5 p-0">
+          <div className="flex flex-col sm:flex-row gap-4 max-w-lg">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 type="text"
-                placeholder="Search by error message, source, or user email..."
+                placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -212,74 +191,9 @@ export default function ErrorLogs() {
         </CardContent>
       </Card>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-red-200">
-          <CardContent className="p-6 py-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-red-600">Total Errors</p>
-                <p className="text-2xl font-bold text-red-900">
-                  {errorLogs.length}
-                </p>
-              </div>
-              <AlertTriangle className="h-8 w-8 text-red-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-blue-200">
-          <CardContent className="p-6 py-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-600">
-                  Last 24 Hours
-                </p>
-                <p className="text-2xl font-bold text-blue-900">
-                  {
-                    errorLogs.filter(
-                      (log) =>
-                        new Date(log.created_at) >
-                        new Date(Date.now() - 24 * 60 * 60 * 1000)
-                    ).length
-                  }
-                </p>
-              </div>
-              <Clock className="h-8 w-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-green-200">
-          <CardContent className="p-6 py-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-green-600">
-                  Filtered Results
-                </p>
-                <p className="text-2xl font-bold text-green-900">
-                  {filteredLogs.length}
-                </p>
-              </div>
-              <Filter className="h-8 w-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Error Logs Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Error Logs</CardTitle>
-          <CardDescription>
-            {filteredLogs.length === 0
-              ? searchTerm
-                ? "No matching error logs found"
-                : "No error logs found"
-              : `Showing ${filteredLogs.length} error logs`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <Card className="border-none py-0 shadow-none">
+        <CardContent className="p-0">
           {filteredLogs.length === 0 ? (
             <div className="text-center py-12">
               <AlertCircle className="w-12 h-12 mx-auto text-gray-400 mb-4" />

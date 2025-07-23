@@ -12,6 +12,8 @@ import {
   LayoutDashboard,
   Shield,
   Bell,
+  ChevronRight,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useState } from "react";
@@ -24,44 +26,38 @@ const adminNavItems = [
   {
     name: "Dashboard",
     href: "/dashboard",
-    icon: <LayoutDashboard className="w-5 h-5" />,
-    description: "Overview & insights",
+    icon: <LayoutDashboard className="w-4 h-4" />,
   },
   {
     name: "User Management",
     href: "/dashboard/users",
-    icon: <Users className="w-5 h-5" />,
-    description: "Manage user accounts",
+    icon: <Users className="w-4 h-4" />,
   },
   {
     name: "Error Logs",
     href: "/dashboard/error-logs",
-    icon: <AlertCircle className="w-5 h-5" />,
-    description: "System error tracking",
+    icon: <AlertCircle className="w-4 h-4" />,
   },
   {
     name: "Notifications",
     href: "/dashboard/notifications",
-    icon: <Bell className="w-5 h-5" />,
-    description: "System notifications",
+    icon: <Bell className="w-4 h-4" />,
+    hasNotifications: true,
   },
   {
     name: "Analytics",
     href: "/dashboard/analytics",
-    icon: <BarChart2 className="w-5 h-5" />,
-    description: "Usage statistics",
+    icon: <BarChart2 className="w-4 h-4" />,
   },
   {
     name: "Requests Count",
     href: "/dashboard/requests-count",
-    icon: <ListOrdered className="w-5 h-5" />,
-    description: "API request metrics",
+    icon: <ListOrdered className="w-4 h-4" />,
   },
   {
     name: "Home",
     href: "/",
-    icon: <Home className="w-5 h-5" />,
-    description: "Back to main app",
+    icon: <Home className="w-4 h-4" />,
   },
 ];
 
@@ -111,113 +107,129 @@ export default function AdminSidebar() {
   };
 
   return (
-    <div className="w-72 bg-gradient-to-b from-white to-gray-50/50 border-r border-gray-200/50 flex flex-col backdrop-blur-sm h-screen overflow-y-auto fixed top-0 left-0">
+    <div className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col h-screen overflow-y-auto fixed top-0 left-0">
       {/* Logo/Brand */}
-      <div className="p-6 border-b border-gray-200/50">
+      <div className="p-6">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg">
-            <Shield className="w-6 h-6 text-white" />
+          <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+            <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              Admin Panel
-            </h1>
-            <p className="text-xs text-gray-500 mt-1">System Management</p>
+            <h1 className="text-gray-900 font-semibold text-lg">Admin Panel</h1>
           </div>
         </div>
       </div>
 
-      {/* Navigation Links */}
-      <nav className="flex-1 p-4">
-        <div className="space-y-1">
-          {adminNavItems.map((item) => {
+      {/* Navigation Section */}
+      <div className="px-6 mb-6">
+        <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+          DASHBOARDS
+        </div>
+        <nav className="space-y-1">
+          {adminNavItems.slice(0, 1).map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`group relative flex items-center gap-4 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                className={`group flex items-center justify-between px-3 py-2 rounded-md text-sm transition-all duration-200 ${
                   isActive
-                    ? "border border-green-300 bg-green-100/50 text-green-700"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-green-100 text-green-700 border border-green-200"
+                    : "text-gray-600 hover:bg-green-50 hover:text-green-600"
                 }`}
               >
-                <div
-                  className={`bg-gray-100 p-2 rounded-lg transition-all duration-200 ${
-                    isActive
-                      ? "text-green-700 bg-green-200"
-                      : "text-gray-500 group-hover:bg-gray-200 group-hover:text-gray-900"
-                  }`}
-                >
+                <div className="flex items-center space-x-3">
                   {item.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="font-semibold">{item.name}</div>
-                  {item.name === "Notifications" && !isNotificationsLoading && (
-                    <div className="text-xs text-gray-500">
-                      {unreadNotifications} unread
-                    </div>
-                  )}
+                  <span>{item.name}</span>
                 </div>
               </Link>
             );
           })}
+        </nav>
+      </div>
+
+      {/* Management Section */}
+      <div className="px-6 mb-6">
+        <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+          MANAGEMENT
         </div>
-      </nav>
+        <nav className="space-y-1">
+          {adminNavItems.slice(1, 6).map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`group flex items-center justify-between px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                  isActive
+                    ? "bg-green-100 text-green-700 border border-green-200"
+                    : "text-gray-600 hover:bg-green-50 hover:text-green-600"
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  {item.icon}
+                  <span>{item.name}</span>
+                </div>
+                {item.hasNotifications &&
+                  !isNotificationsLoading &&
+                  unreadNotifications > 0 && (
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  )}
+                <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-green-500" />
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Navigation Section */}
+      <div className="px-6 mb-6">
+        <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+          NAVIGATION
+        </div>
+        <nav className="space-y-1">
+          {adminNavItems.slice(6).map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`group flex items-center justify-between px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                  isActive
+                    ? "bg-green-100 text-green-700 border border-green-200"
+                    : "text-gray-600 hover:bg-green-50 hover:text-green-600"
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  {item.icon}
+                  <span>{item.name}</span>
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
 
       {/* System Status */}
-      <div className="px-7 mb-4 mt-6">
-        <div className="flex items-center gap-2">
+      <div className="px-6 mb-6">
+        <div className="flex items-center gap-2 text-sm">
           {isLoading ? (
-            <div className="w-3 h-3 rounded-full bg-gray-500 animate-pulse"></div>
+            <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
           ) : (
             <div
-              className={`w-3 h-3 rounded-full ${
+              className={`w-2 h-2 rounded-full ${
                 isHealthy ? "bg-green-500" : "bg-red-500"
               }`}
             ></div>
           )}
-          <p className="text-sm text-gray-700">
+          <span className="text-gray-500 text-xs">
             {isLoading
-              ? "Checking system status..."
+              ? "Checking..."
               : isHealthy
               ? "System operational"
               : "System degraded"}
-          </p>
+          </span>
         </div>
-      </div>
-
-      {/* User Section */}
-      <div className="p-4 border-t border-gray-200/50">
-        <Card className="bg-white/60 backdrop-blur-sm border-gray-200/50 shadow-sm py-3">
-          <CardContent className="px-4 py-0">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                <User className="w-6 h-6 text-green-600" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">
-                  {user?.user_metadata?.full_name || user?.email || "Admin"}
-                </p>
-                <p className="text-xs text-gray-500 truncate flex items-center gap-1">
-                  {user?.email}
-                </p>
-              </div>
-            </div>
-
-            <Separator className="my-3" />
-
-            {/* Logout Button */}
-            <Button
-              variant="ghost"
-              onClick={handleLogout}
-              className="cursor-pointer w-full flex items-center justify-start px-3 py-2 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
-            >
-              <LogOut className="w-4 h-4 mr-3 transition-transform duration-200" />
-              Sign Out
-            </Button>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Spinner from "@/components/Spinner";
+import AdminNavbar from "@/components/AdminNavbar";
 
 interface Notification {
   id: string;
@@ -96,6 +97,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6 p-6 max-w-7xl">
+      <AdminNavbar />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -117,14 +119,8 @@ export default function NotificationsPage() {
       </div>
 
       {/* Notifications List */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="w-5 h-5" />
-            All Notifications
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="border-none py-0 shadow-none">
+        <CardContent className="p-0 mt-5">
           {notifications.length === 0 ? (
             <div className="text-center py-8">
               <Bell className="w-12 h-12 text-gray-300 mx-auto mb-4" />
