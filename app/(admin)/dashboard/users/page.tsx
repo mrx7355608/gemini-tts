@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import Spinner from "@/components/Spinner";
 
 export default function UsersPage() {
   const { users, bannedUsersIDs, loading, error, refreshUsers } = useUsers();
@@ -76,14 +77,7 @@ export default function UsersPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex items-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-green-600" />
-          <span className="text-gray-600">Loading users...</span>
-        </div>
-      </div>
-    );
+    return <Spinner message="Please wait while we fetch users data..." />;
   }
 
   return (

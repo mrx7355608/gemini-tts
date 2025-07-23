@@ -6,6 +6,7 @@ import { Bell, Clock, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import Spinner from "@/components/Spinner";
 
 interface Notification {
   id: string;
@@ -90,14 +91,7 @@ export default function NotificationsPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="flex items-center gap-2 text-gray-500">
-          <RefreshCw className="w-5 h-5 animate-spin" />
-          <span>Loading notifications...</span>
-        </div>
-      </div>
-    );
+    return <Spinner message="Please wait while we fetch notifications..." />;
   }
 
   return (

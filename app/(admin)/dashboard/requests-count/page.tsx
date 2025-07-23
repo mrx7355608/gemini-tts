@@ -28,6 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 // Progress component created inline
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import Spinner from "@/components/Spinner";
 
 interface ModelUsage {
   model_name: string;
@@ -55,19 +56,18 @@ const SYSTEM_LIMIT = 1000;
 const MODEL_COLORS = {
   "gemini-tts-2.5-flash": "#3B82F6",
   "gemini-tts-2.5-pro": "#10B981",
-  "Gemini 2.5 Flash": "#3B82F6",
-  "Gemini 2.5 Pro": "#10B981",
   default: "#6B7280",
 };
 
 const MODEL_DISPLAY_NAMES = {
   "gemini-tts-2.5-flash": "Gemini TTS 2.5 Flash",
   "gemini-tts-2.5-pro": "Gemini TTS 2.5 Pro",
-  "Gemini 2.5 Flash": "Gemini TTS 2.5 Flash",
-  "Gemini 2.5 Pro": "Gemini TTS 2.5 Pro",
 };
 
 export default function RequestCount() {
+  const [recentUsage, setRecentUsage] = useState<RecentUsage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<UsageStats>({
     totalUsed: 0,
     remaining: SYSTEM_LIMIT,
@@ -75,9 +75,6 @@ export default function RequestCount() {
     usagePercentage: 0,
     modelBreakdown: [],
   });
-  const [recentUsage, setRecentUsage] = useState<RecentUsage[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchRequestsData();
@@ -200,21 +197,7 @@ export default function RequestCount() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-300 rounded w-1/3 mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-gray-300 rounded-xl h-32"></div>
-            ))}
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {[...Array(2)].map((_, i) => (
-              <div key={i} className="bg-gray-300 rounded-xl h-64"></div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <Spinner message="Please wait while we fetch the requests data..." />
     );
   }
 

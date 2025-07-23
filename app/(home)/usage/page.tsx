@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import Spinner from "@/components/Spinner";
 
 interface UsageData {
   model_name: string;
@@ -105,19 +106,7 @@ export default function UsagePage() {
     (usageData.totalRequests / usageData.monthlyLimit) * 100;
 
   if (loading) {
-    return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-300 rounded w-1/3 mb-4"></div>
-          <div className="h-4 bg-gray-300 rounded w-1/2 mb-8"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-gray-300 rounded-xl h-32"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <Spinner message="Please wait while we fetch the usage data..." />;
   }
 
   if (error) {

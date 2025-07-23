@@ -265,28 +265,6 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">
-                  Total Requests
-                </p>
-                <p className="text-3xl font-bold text-green-600">
-                  {stats.totalRequests}
-                </p>
-                <p className="text-xs text-gray-500 mt-1 flex items-center">
-                  <TrendingUp className="w-3 h-3 mr-1" />
-                  All time
-                </p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Activity className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
                   System Errors
                 </p>
                 <p className="text-3xl font-bold text-red-600">
