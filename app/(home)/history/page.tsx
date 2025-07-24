@@ -50,25 +50,14 @@ export default async function HistoryPage() {
   }
 
   const historyData = history as HistoryItem[];
-  const totalGenerations = historyData?.length || 0;
-  const recentGenerations =
-    historyData?.filter((item) => {
-      const itemDate = new Date(item.created_at);
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      return itemDate >= sevenDaysAgo;
-    }).length || 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-white p-6">
+      <div className="max-w-7xl mx-auto space-y-5">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-5">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Clock className="w-5 h-5 text-white" />
-              </div>
               History
             </h1>
             <p className="text-gray-600 mt-2">
@@ -77,94 +66,9 @@ export default async function HistoryPage() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="shadow-lg border-0 bg-white/95 backdrop-blur hover:shadow-xl transition-all duration-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Total Generations
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <span className="text-3xl font-bold text-gray-900">
-                  {totalGenerations}
-                </span>
-                <Badge
-                  variant="secondary"
-                  className="bg-green-100 text-green-700"
-                >
-                  All Time
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-lg border-0 bg-white/95 backdrop-blur hover:shadow-xl transition-all duration-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" />
-                Recent Activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <span className="text-3xl font-bold text-green-600">
-                  {recentGenerations}
-                </span>
-                <Badge
-                  variant="secondary"
-                  className="bg-blue-100 text-blue-700"
-                >
-                  Last 7 Days
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-lg border-0 bg-white/95 backdrop-blur hover:shadow-xl transition-all duration-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Last Generation
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-semibold text-gray-900">
-                  {historyData && historyData.length > 0
-                    ? new Date(historyData[0].created_at).toLocaleDateString()
-                    : "No data"}
-                </span>
-                <Badge variant="outline" className="text-xs">
-                  {historyData && historyData.length > 0
-                    ? new Date(historyData[0].created_at).toLocaleTimeString(
-                        [],
-                        {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }
-                      )
-                    : "--:--"}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* History Table */}
-        <Card className="shadow-xl border-0 bg-white/95 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Mic className="w-5 h-5 text-green-600" />
-              Generation History
-            </CardTitle>
-            <CardDescription>
-              Complete history of your text-to-speech generations
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
+        <Card className="shadow-none border-none">
+          <CardContent className="p-0 h-full">
             {!historyData || historyData.length === 0 ? (
               <div className="p-16 text-center">
                 <div className="flex items-center justify-center mb-6">
