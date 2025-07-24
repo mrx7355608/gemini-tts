@@ -27,8 +27,8 @@ export default function TaskStatus({
 
   if (error) {
     console.log(error);
-    return handleError("An error occurred while converting audio to mp3");
+    handleError("An error occurred while converting audio to mp3");
   }
 
-  return <></>;
+  return <div className="hidden"></div>;
 }

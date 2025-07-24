@@ -17,16 +17,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import {
-  Calendar,
-  TrendingUp,
-  Users,
-  Activity,
-  Crown,
-  BarChart3,
-  Clock,
-  User,
-} from "lucide-react";
+import { Calendar, Activity, BarChart3, Clock, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -57,10 +48,6 @@ export default function Analytics() {
     "#34d399", // emerald-300
     "#6ee7b7", // emerald-200
   ];
-
-  const truncate = (text: string, maxLength: number) => {
-    return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
-  };
 
   if (loading) {
     return <Spinner />;

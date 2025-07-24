@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { Bell, LogOut, User, Settings, ChevronDown } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

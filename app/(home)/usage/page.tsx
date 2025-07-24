@@ -18,11 +18,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/Spinner";
 
-interface UsageData {
-  model_name: string;
-  requests_used: number;
-}
-
 interface ProcessedUsageData {
   totalRequests: number;
   remainingRequests: number;
@@ -386,8 +381,8 @@ export default function UsagePage() {
             No Usage Data
           </h3>
           <p className="text-gray-600">
-            You haven't made any API requests yet. Start using the service to
-            see your usage statistics here.
+            You haven&apos;t made any API requests yet. Start using the service
+            to see your usage statistics here.
           </p>
         </div>
       )}

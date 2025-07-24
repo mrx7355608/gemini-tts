@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Bell, Clock, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Spinner from "@/components/Spinner";
 import AdminNavbar from "@/components/AdminNavbar";
@@ -128,7 +128,7 @@ export default function NotificationsPage() {
                 No notifications
               </h3>
               <p className="text-gray-500">
-                Notifications will appear here when they're created.
+                Notifications will appear here when they are created.
               </p>
             </div>
           ) : (

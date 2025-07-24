@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import ProtectedRoute from "../../../components/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, UserPlus, ArrowRight, CheckCircle } from "lucide-react";
+import { Loader2, UserPlus, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 const supabase = createClient();

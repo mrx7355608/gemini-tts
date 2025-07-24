@@ -6,20 +6,13 @@ import {
   AlertCircle,
   BarChart2,
   ListOrdered,
-  User,
-  LogOut,
   Home,
   LayoutDashboard,
   Shield,
   Bell,
   ChevronRight,
-  Sparkles,
 } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 
 const adminNavItems = [
@@ -65,7 +58,6 @@ const supabase = createClient();
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const { user, signOut } = useAuth();
   const [isHealthy, setIsHealthy] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
@@ -101,10 +93,6 @@ export default function AdminSidebar() {
     checkHealth();
     checkNotifications();
   }, []);
-
-  const handleLogout = async () => {
-    await signOut();
-  };
 
   return (
     <div className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col h-screen overflow-y-auto fixed top-0 left-0">

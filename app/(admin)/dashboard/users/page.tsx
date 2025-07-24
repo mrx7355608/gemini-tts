@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Loader2, Search, Users, Filter } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { UserData } from "@/lib/types";
 import UsersTable from "@/components/UsersTable";
 import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";

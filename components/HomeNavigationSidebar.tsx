@@ -6,23 +6,14 @@ import {
   LogOut,
   Mic,
   User,
-  Sparkles,
   ChevronRight,
   Shield,
   LayoutDashboard,
-  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export default function HomeNavigationSidebar() {
   const { user, signOut } = useAuth();

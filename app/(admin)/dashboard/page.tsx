@@ -7,13 +7,10 @@ import {
   AlertTriangle,
   TrendingUp,
   Clock,
-  ShieldCheck,
   BarChart3,
   UserPlus,
-  Mic2,
   Bell,
   ArrowUpRight,
-  User,
   Calendar,
   CalendarDays,
 } from "lucide-react";
@@ -25,9 +22,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  PieChart,
-  Pie,
-  Cell,
   Tooltip,
   ResponsiveContainer,
   BarChart,
@@ -71,8 +65,6 @@ interface RecentActivity {
   timestamp: string;
   user_email?: string;
 }
-
-const MODEL_COLORS = ["#10B981", "#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6"];
 
 export default function Dashboard() {
   const { users, bannedUsersIDs, loading: usersLoading } = useUsers();

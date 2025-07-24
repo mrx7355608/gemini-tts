@@ -19,7 +19,6 @@ import {
   CheckCircle,
   BarChart3,
   Zap,
-  TrendingUp,
   Clock,
   AlertCircle,
 } from "lucide-react";

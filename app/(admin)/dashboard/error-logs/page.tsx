@@ -1,32 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import {
-  AlertCircle,
-  Clock,
-  User,
-  ExternalLink,
-  RefreshCw,
-  Search,
-  Settings,
-  Filter,
-  AlertTriangle,
-  CheckCircle,
-  Info,
-  Eye,
-  Calendar,
-} from "lucide-react";
+import { AlertCircle, RefreshCw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,

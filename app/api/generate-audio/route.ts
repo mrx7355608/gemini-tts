@@ -3,7 +3,6 @@ import { tasks } from "@trigger.dev/sdk/v3";
 import { NextRequest, NextResponse } from "next/server";
 import type { convertPcmToMp3 } from "@/app/trigger/convert-pcm-to-mp3";
 import { splitPrompt } from "@/lib/split-prompt";
-import wav from "wav";
 import { createClient } from "@/lib/supabase/server";
 import { randomUUID } from "crypto";
 import { logError } from "@/lib/errorLogger";
@@ -92,11 +91,6 @@ export async function POST(req: NextRequest) {
     const uploadResponses = await Promise.all(uploadPromises);
     console.log("Upload responses: ", uploadResponses);
 
-    // Save file locally on filesystem for testing purposes
-    // console.log("Saving file locally...");
-    // const combinedBuffer = Buffer.concat(buffers);
-    // await saveWaveFile("test2.wav", combinedBuffer);
-
     // Convert PCM to MP3 using trigger.dev
     const pcmFilePaths = uploadResponses.map((response) => response.data?.path);
     const handler = await tasks.trigger<typeof convertPcmToMp3>(
@@ -126,26 +120,4 @@ function parseError(err: any) {
     errorMessage = JSON.parse(err.message).error.message.substring(0, 31);
   }
   return new Error(errorMessage);
-}
-
-async function saveWaveFile(
-  filename: string,
-  pcmData: Buffer,
-  channels = 1,
-  rate = 24000,
-  sampleWidth = 2
-) {
-  return new Promise((resolve, reject) => {
-    const writer = new wav.FileWriter(filename, {
-      channels,
-      sampleRate: rate,
-      bitDepth: sampleWidth * 8,
-    });
-
-    writer.on("finish", resolve);
-    writer.on("error", reject);
-
-    writer.write(pcmData);
-    writer.end();
-  });
 }

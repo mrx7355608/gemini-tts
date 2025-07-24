@@ -1,21 +1,8 @@
 import { getHistory } from "@/lib/history-services";
-import {
-  Clock,
-  Mic,
-  AlertCircle,
-  TrendingUp,
-  FileText,
-  Calendar,
-} from "lucide-react";
+import { Mic, AlertCircle } from "lucide-react";
 import { HistoryItem } from "@/lib/types";
 import HistoryTable from "../../../components/HistoryTable";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 

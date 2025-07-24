@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const data = await getBannedUsersIDs();
     return NextResponse.json({ data });

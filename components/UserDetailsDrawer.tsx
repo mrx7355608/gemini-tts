@@ -29,11 +29,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
 } from "recharts";
 import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/Spinner";
@@ -74,7 +69,8 @@ export default function UserDetailsDrawer({
   setIsDrawerOpen: (open: boolean) => void;
   isBlocked: boolean;
 }) {
-  const [usageData, setUsageData] = useState<UsageData[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, setUsageData] = useState<UsageData[]>([]);
   const [dailyUsage, setDailyUsage] = useState<DailyUsage[]>([]);
   const [modelUsage, setModelUsage] = useState<ModelUsage[]>([]);
   const [totalRequests, setTotalRequests] = useState(0);

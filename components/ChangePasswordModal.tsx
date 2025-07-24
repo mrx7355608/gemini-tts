@@ -1,4 +1,4 @@
-import { X, Save, Loader2, Key } from "lucide-react";
+import { X, Loader2, Key } from "lucide-react";
 import { UserData } from "@/lib/types";
 import { useState } from "react";
 
