@@ -262,7 +262,7 @@ export default function Dashboard() {
   }, [users, bannedUsersIDs, usersLoading]);
 
   if (loading || usersLoading || analyticsLoading) {
-    return <Spinner message="Loading dashboard..." />;
+    return <Spinner />;
   }
 
   const formatTimeAgo = (timestamp: string) => {

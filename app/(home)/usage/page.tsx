@@ -11,6 +11,8 @@ import {
   PieChart,
   Pie,
   Cell,
+  LineChart,
+  Line,
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
@@ -33,11 +35,15 @@ interface ProcessedUsageData {
 }
 
 const MODEL_COLORS: { [key: string]: string } = {
-  "Gemini 2.5 Pro": "#10B981",
-  "Gemini 2.5 Flash": "#3B82F6",
-  "Gemini Pro": "#F59E0B",
-  "Gemini Flash": "#EF4444",
+  "gemini-2.5-pro-preview-tts": "#6EE7B7", // light emerald
+  "gemini-2.5-flash-preview-tts": "#10B981", // medium emerald
   default: "#6B7280",
+};
+
+// Add a mapping for model labels
+const MODEL_LABELS: { [key: string]: string } = {
+  "gemini-2.5-flash-preview-tts": "Gemini 2.5 Flash TTS",
+  "gemini-2.5-pro-preview-tts": "Gemini 2.5 Pro TTS",
 };
 
 export default function UsagePage() {
@@ -50,6 +56,9 @@ export default function UsagePage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dailyUsage, setDailyUsage] = useState<
+    Array<{ date: string; requests: number }>
+  >([]);
 
   useEffect(() => {
     const fetchUsageData = async () => {
@@ -63,7 +72,7 @@ export default function UsagePage() {
 
         const { data: rawData, error } = await supabase
           .from("usage")
-          .select("model_name, requests_used")
+          .select("model_name, requests_used, created_at")
           .eq("user_id", user.id);
 
         if (error) {
@@ -79,11 +88,41 @@ export default function UsagePage() {
         const remainingRequests = Math.max(0, monthlyLimit - totalRequests);
 
         // Group by model and prepare for charts
-        const modelUsage = rawData.map((item, index) => ({
-          name: item.model_name,
-          requests: item.requests_used,
-          color: MODEL_COLORS[item.model_name] || MODEL_COLORS.default,
+        const modelMap: { [key: string]: number } = {};
+        rawData.forEach((item) => {
+          if (!modelMap[item.model_name]) {
+            modelMap[item.model_name] = 0;
+          }
+          modelMap[item.model_name] += item.requests_used;
+        });
+        const modelUsage = Object.entries(modelMap).map(([name, requests]) => ({
+          name,
+          requests,
+          color: MODEL_COLORS[name] || MODEL_COLORS.default,
+          label: MODEL_LABELS[name] || name,
         }));
+
+        // Group by day for daily usage chart
+        const dailyMap: { [date: string]: number } = {};
+        rawData.forEach((item) => {
+          const dateKey = new Date(item.created_at).toISOString().split("T")[0];
+          if (!dailyMap[dateKey]) {
+            dailyMap[dateKey] = 0;
+          }
+          dailyMap[dateKey] += item.requests_used;
+        });
+        // Always show last 7 days (including days with 0 requests)
+        const last7Dates: string[] = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          last7Dates.push(d.toISOString().split("T")[0]);
+        }
+        const dailyUsageArr = last7Dates.map((date) => ({
+          date,
+          requests: dailyMap[date] || 0,
+        }));
+        setDailyUsage(dailyUsageArr);
 
         setUsageData({
           totalRequests,
@@ -133,10 +172,10 @@ export default function UsagePage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-sm font-medium text-gray-800">
                 Total Requests
               </p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-3xl font-bold text-green-600">
                 {usageData.totalRequests}
               </p>
             </div>
@@ -161,22 +200,16 @@ export default function UsagePage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-sm font-medium text-gray-800">
                 Remaining Requests
               </p>
-              <p
-                className={`text-3xl font-bold ${
-                  usageData.remainingRequests <= 10
-                    ? "text-red-600"
-                    : "text-blue-600"
-                }`}
-              >
+              <p className={`text-3xl font-bold text-green-600`}>
                 {usageData.remainingRequests}
               </p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
               <svg
-                className="w-6 h-6 text-blue-600"
+                className="w-6 h-6 text-green-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -195,30 +228,39 @@ export default function UsagePage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Monthly Limit</p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-gray-800">Monthly Limit</p>
+              <p className="text-3xl font-bold text-green-600">
                 {usageData.monthlyLimit}
               </p>
               <div className="mt-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Usage</span>
-                  <span className="font-medium">
+                  <span className="text-gray-800">Usage</span>
+                  <span className="font-medium text-gray-800">
                     {usagePercentage.toFixed(1)}%
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                   <div
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      usagePercentage >= 90
-                        ? "bg-red-500"
-                        : usagePercentage >= 70
-                        ? "bg-yellow-500"
-                        : "bg-green-500"
-                    }`}
+                    className={`h-2 rounded-full transition-all duration-300 bg-green-500`}
                     style={{ width: `${Math.min(usagePercentage, 100)}%` }}
                   ></div>
                 </div>
               </div>
+            </div>
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg
+                className="w-6 h-6 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
             </div>
           </div>
         </div>
@@ -226,51 +268,103 @@ export default function UsagePage() {
 
       {/* Charts Section */}
       {usageData.modelUsage.length > 0 ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Model Usage Chart */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Model Usage Distribution
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={usageData.modelUsage}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) =>
-                    `${name} ${(percent || 0) * 100}%`
-                  }
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="requests"
-                >
-                  {usageData.modelUsage.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Model Usage Chart */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Model Usage Distribution
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={usageData.modelUsage}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) =>
+                      `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`
+                    }
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="requests"
+                  >
+                    {usageData.modelUsage.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Model Usage Bar Chart */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Requests by Model
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={usageData.modelUsage}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="label" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar
+                    dataKey="requests"
+                    radius={[4, 4, 0, 0]}
+                    {...(usageData.modelUsage.length === 1
+                      ? { fill: usageData.modelUsage[0].color }
+                      : {})}
+                  >
+                    {usageData.modelUsage.map((entry, index) => (
+                      <Cell key={`bar-cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
 
-          {/* Model Usage Bar Chart */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          {/* Daily Usage Chart */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Requests by Model
+              Daily Usage (Last 7 Days)
             </h3>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={usageData.modelUsage}>
+              <LineChart data={dailyUsage}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="requests" fill="#10B981" radius={[4, 4, 0, 0]} />
-              </BarChart>
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={(date) => {
+                    const d = new Date(date);
+                    return d.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    });
+                  }}
+                />
+                <YAxis allowDecimals={false} />
+                <Tooltip
+                  labelFormatter={(date) => {
+                    const d = new Date(date);
+                    return d.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    });
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="requests"
+                  stroke="#10B981"
+                  strokeWidth={3}
+                  dot={{ r: 4, fill: "#10B981" }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </>
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
           <div className="w-16 h-16 bg-gray-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
