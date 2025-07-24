@@ -63,9 +63,7 @@ export default function Analytics() {
   };
 
   if (loading) {
-    return (
-      <Spinner message="Please wait while we fetch the analytics data..." />
-    );
+    return <Spinner />;
   }
 
   return (

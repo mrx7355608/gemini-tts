@@ -287,7 +287,7 @@ export default function UserDetailsDrawer({
             <CardContent>
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <Spinner message="Loading usage data..." />
+                  <Spinner />
                 </div>
               ) : (
                 <div className="space-y-6">

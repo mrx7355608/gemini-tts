@@ -8,7 +8,7 @@ export default function HomeLayout({
   return (
     <div className="flex h-screen">
       <HomeNavigationSidebar />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main className="flex-1 ml-64 overflow-auto">{children}</main>
     </div>
   );
 }

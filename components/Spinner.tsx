@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { LoaderCircle } from "lucide-react";
 
-export default function Spinner({ message }: { message: string }) {
+export default function Spinner() {
   return (
     <div className="flex flex-col items-center justify-center h-[80vh] p-6">
       <Card className="max-w-md w-full border-none shadow-none">

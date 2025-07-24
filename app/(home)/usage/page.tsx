@@ -106,7 +106,7 @@ export default function UsagePage() {
     (usageData.totalRequests / usageData.monthlyLimit) * 100;
 
   if (loading) {
-    return <Spinner message="Please wait while we fetch the usage data..." />;
+    return <Spinner />;
   }
 
   if (error) {

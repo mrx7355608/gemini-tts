@@ -96,7 +96,7 @@ export default function SpeechSettings({
     >
       {/* Sidebar content */}
       <Card
-        className={`backdrop-blur-sm bg-white/80 border-0 shadow-xl h-full transition-all duration-300 ease-in-out
+        className={`border shadow-xl h-full transition-all duration-300 ease-in-out
           ${
             sidebarOpen
               ? "opacity-100 w-80"
@@ -128,11 +128,11 @@ export default function SpeechSettings({
           {/* Model Selection */}
           <div className="space-y-3">
             <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-              <Mic className="w-4 h-4 text-blue-500" />
+              <Mic className="w-4 h-4 text-green-500" />
               AI Model
             </Label>
             <Select value={selectedModel} onValueChange={setSelectedModel}>
-              <SelectTrigger className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200">
+              <SelectTrigger className="h-12 border-gray-200 focus:border-gray-500 focus:ring-gray-500/20 transition-all duration-200">
                 <SelectValue placeholder="Select a model" />
               </SelectTrigger>
               <SelectContent>
@@ -176,7 +176,7 @@ export default function SpeechSettings({
           {/* Gender Filter */}
           <div className="space-y-3">
             <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-              <Volume2 className="w-4 h-4 text-purple-500" />
+              <Volume2 className="w-4 h-4 text-green-500" />
               Voice Gender
             </Label>
             <RadioGroup
@@ -217,7 +217,7 @@ export default function SpeechSettings({
           {/* Voice Selection */}
           <div className="space-y-3">
             <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-              <Volume2 className="w-4 h-4 text-indigo-500" />
+              <Volume2 className="w-4 h-4 text-green-500" />
               Voice Selection
             </Label>
             <Select value={selectedVoice} onValueChange={setSelectedVoice}>
@@ -241,13 +241,13 @@ export default function SpeechSettings({
 
           {/* Voice Preview Info */}
           {selectedVoice && (
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+            <div className="bg-green-50 rounded-xl p-4 border border-green-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-indigo-900 capitalize">
+                  <h4 className="font-semibold text-green-900 capitalize">
                     {selectedVoice}
                   </h4>
-                  <p className="text-sm text-indigo-600">
+                  <p className="text-sm text-green-700">
                     {
                       VOICE_OPTIONS.find(
                         (v) => v.name.toLowerCase() === selectedVoice

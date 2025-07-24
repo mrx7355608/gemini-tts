@@ -92,7 +92,7 @@ export default function NotificationsPage() {
   }, []);
 
   if (loading) {
-    return <Spinner message="Please wait while we fetch notifications..." />;
+    return <Spinner />;
   }
 
   return (

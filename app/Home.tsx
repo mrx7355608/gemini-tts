@@ -141,11 +141,11 @@ export default function HomePage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl">
           <div className="flex flex-col xl:flex-row gap-6 lg:gap-8">
             {/* Main Content Card */}
-            <Card className="flex-1 backdrop-blur-sm bg-white/80 border-0 shadow-xl rounded-2xl pt-0">
+            <Card className="flex-1 border shadow-xl rounded-2xl pt-0">
               <CardHeader className="p-6 pb-0 mt-2">
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-white/20 rounded-lg">
@@ -176,7 +176,7 @@ export default function HomePage() {
                 {/* Style Instructions */}
                 <div className="space-y-3">
                   <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-blue-500" />
+                    <Sparkles className="w-4 h-4 text-green-500" />
                     Style Instructions
                   </Label>
                   <Input
@@ -184,7 +184,7 @@ export default function HomePage() {
                     value={styleInstructions}
                     onChange={(e) => setStyleInstructions(e.target.value)}
                     placeholder="Read aloud in a warm and friendly tone:"
-                    className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                    className="h-12 border-gray-200 focus:border-gray-500 focus:ring-gray-500/20 transition-all duration-200"
                   />
                 </div>
 

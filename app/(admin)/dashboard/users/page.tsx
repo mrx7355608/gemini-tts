@@ -109,7 +109,7 @@ export default function UsersPage() {
   };
 
   if (loading) {
-    return <Spinner message="Please wait while we fetch users data..." />;
+    return <Spinner />;
   }
 
   return (

@@ -209,9 +209,7 @@ export default function RequestCount() {
   };
 
   if (loading) {
-    return (
-      <Spinner message="Please wait while we fetch the requests data..." />
-    );
+    return <Spinner />;
   }
 
   if (error) {

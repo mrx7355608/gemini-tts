@@ -115,7 +115,7 @@ export default function ErrorLogs() {
   const categories = ["All", "Supabase", "API Error", "Trigger"];
 
   if (loading) {
-    return <Spinner message="Please wait while we fetch the error logs..." />;
+    return <Spinner />;
   }
 
   if (error) {

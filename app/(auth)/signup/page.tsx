@@ -66,10 +66,10 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-green-50 p-4">
       <div className="w-full max-w-md">
-        <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur">
-          <CardHeader className="space-y-1 text-center pb-6">
+        <Card className="shadow-none border-0 bg-transparent">
+          <CardHeader className="space-y-1 text-center">
             <div className="flex items-center justify-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
                 <UserPlus className="w-6 h-6 text-white" />
               </div>
             </div>
@@ -145,7 +145,7 @@ export default function SignupPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-11 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                className="mt-4 cursor-pointer w-full h-11 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {loading ? (
                   <>
@@ -175,7 +175,7 @@ export default function SignupPage() {
             <Link href="/login">
               <Button
                 variant="outline"
-                className="w-full h-11 border-gray-200 hover:border-green-500 hover:bg-green-50 transition-all duration-200"
+                className="cursor-pointer w-full h-11 border-gray-200 hover:border-green-500 hover:bg-green-50 transition-all duration-200"
               >
                 Sign In
               </Button>
