@@ -52,6 +52,7 @@ export async function DELETE(
     await deleteUser(id);
     return NextResponse.json({ success: true });
   } catch (error: any) {
+    await logError(error, "API Error - Delete User");
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

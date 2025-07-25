@@ -17,11 +17,12 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/Spinner";
+import { Card, CardContent } from "@/components/ui/card";
+import { Zap } from "lucide-react";
 
 interface ProcessedUsageData {
-  totalRequests: number;
-  remainingRequests: number;
-  monthlyLimit: number;
+  geminiFlashRequests: number;
+  geminiProRequests: number;
   modelUsage: Array<{
     name: string;
     requests: number;
@@ -44,9 +45,8 @@ const MODEL_LABELS: { [key: string]: string } = {
 export default function UsagePage() {
   const { user } = useAuth();
   const [usageData, setUsageData] = useState<ProcessedUsageData>({
-    totalRequests: 0,
-    remainingRequests: 50,
-    monthlyLimit: 50,
+    geminiFlashRequests: 0,
+    geminiProRequests: 0,
     modelUsage: [],
   });
   const [loading, setLoading] = useState(true);
@@ -75,12 +75,12 @@ export default function UsagePage() {
         }
 
         // Process the data
-        const totalRequests = rawData.reduce(
-          (sum, item) => sum + item.requests_used,
-          0
-        );
-        const monthlyLimit = 50;
-        const remainingRequests = Math.max(0, monthlyLimit - totalRequests);
+        const geminiFlashRequests = rawData
+          .filter((item) => item.model_name === "gemini-2.5-flash-preview-tts")
+          .reduce((sum, item) => sum + item.requests_used, 0);
+        const geminiProRequests = rawData
+          .filter((item) => item.model_name === "gemini-2.5-pro-preview-tts")
+          .reduce((sum, item) => sum + item.requests_used, 0);
 
         // Group by model and prepare for charts
         const modelMap: { [key: string]: number } = {};
@@ -120,9 +120,8 @@ export default function UsagePage() {
         setDailyUsage(dailyUsageArr);
 
         setUsageData({
-          totalRequests,
-          remainingRequests,
-          monthlyLimit,
+          geminiFlashRequests,
+          geminiProRequests,
           modelUsage,
         });
       } catch (err) {
@@ -135,9 +134,6 @@ export default function UsagePage() {
 
     fetchUsageData();
   }, [user?.id]);
-
-  const usagePercentage =
-    (usageData.totalRequests / usageData.monthlyLimit) * 100;
 
   if (loading) {
     return <Spinner />;
@@ -168,10 +164,10 @@ export default function UsagePage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-800">
-                Total Requests
+                Gemini Pro TTS Requests Used
               </p>
               <p className="text-3xl font-bold text-green-600">
-                {usageData.totalRequests}
+                {usageData.geminiProRequests}
               </p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -196,10 +192,10 @@ export default function UsagePage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-800">
-                Remaining Requests
+                Gemini Flash TTS Requests Used
               </p>
               <p className={`text-3xl font-bold text-green-600`}>
-                {usageData.remainingRequests}
+                {usageData.geminiFlashRequests}
               </p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -220,45 +216,37 @@ export default function UsagePage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-800">Monthly Limit</p>
-              <p className="text-3xl font-bold text-green-600">
-                {usageData.monthlyLimit}
-              </p>
-              <div className="mt-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-800">Usage</span>
-                  <span className="font-medium text-gray-800">
-                    {usagePercentage.toFixed(1)}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                  <div
-                    className={`h-2 rounded-full transition-all duration-300 bg-green-500`}
-                    style={{ width: `${Math.min(usagePercentage, 100)}%` }}
-                  ></div>
-                </div>
+        <Card className="border border-gray-300 shadow-sm py-1">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Daily Flash Model Limit
+                </p>
+                <p className="text-3xl font-bold text-gray-900">100</p>
+              </div>
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <Zap className="w-6 h-6 text-gray-600" />
               </div>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-gray-300 shadow-sm py-1">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Daily Pro Model Limit
+                </p>
+                <p className="text-3xl font-bold text-gray-900">50</p>
+              </div>
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <Zap className="w-6 h-6 text-gray-600" />
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Section */}

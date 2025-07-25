@@ -51,7 +51,7 @@ interface RecentUsage {
   models: { [key: string]: number };
 }
 
-const SYSTEM_LIMIT = 1000;
+const SYSTEM_LIMIT = 150;
 
 const MODEL_COLORS = {
   "gemini-tts-2.5-flash": "#10b981", // emerald-500
@@ -287,6 +287,85 @@ export default function RequestCount() {
 
       {/* Main Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Remaining */}
+        <Card className="border border-gray-300 shadow-sm py-1">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Requests Remaining
+                </p>
+                <p
+                  className={`text-3xl font-bold ${
+                    stats.remaining <= 50
+                      ? "text-red-600"
+                      : stats.remaining <= 100
+                      ? "text-yellow-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  {stats.remaining.toLocaleString()}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Out of {stats.limit.toLocaleString()} total
+                </p>
+              </div>
+              <div
+                className={`p-3 ${
+                  stats.remaining <= 50
+                    ? "bg-red-100"
+                    : stats.remaining <= 100
+                    ? "bg-yellow-100"
+                    : "bg-green-100"
+                } rounded-lg`}
+              >
+                {stats.remaining <= 50 && (
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                )}
+                {stats.remaining <= 100 && (
+                  <AlertTriangle className="w-6 h-6 text-yellow-600" />
+                )}
+                {stats.remaining > 100 && (
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* System Limit */}
+        <Card className="border border-gray-300 shadow-sm py-1">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Daily Flash Model Limit
+                </p>
+                <p className="text-3xl font-bold text-gray-900">100</p>
+              </div>
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <Zap className="w-6 h-6 text-gray-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-gray-300 shadow-sm py-1">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Daily Pro Model Limit
+                </p>
+                <p className="text-3xl font-bold text-gray-900">50</p>
+              </div>
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <Zap className="w-6 h-6 text-gray-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Total Used */}
         <Card className="border border-gray-300 shadow-sm py-2">
           <CardContent className="p-6">
@@ -327,68 +406,6 @@ export default function RequestCount() {
                   )}`}
                   style={{ width: `${Math.min(stats.usagePercentage, 100)}%` }}
                 ></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Remaining */}
-        <Card className="border border-gray-300 shadow-sm py-1">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Requests Remaining
-                </p>
-                <p
-                  className={`text-3xl font-bold ${
-                    stats.remaining <= 100
-                      ? "text-red-600"
-                      : stats.remaining <= 300
-                      ? "text-yellow-600"
-                      : "text-green-600"
-                  }`}
-                >
-                  {stats.remaining.toLocaleString()}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Out of {stats.limit.toLocaleString()} total
-                </p>
-              </div>
-              <div
-                className={`p-3 ${
-                  stats.remaining <= 100
-                    ? "bg-red-100"
-                    : stats.remaining <= 300
-                    ? "bg-yellow-100"
-                    : "bg-green-100"
-                } rounded-lg`}
-              >
-                {stats.remaining <= 100 ? (
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
-                ) : (
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* System Limit */}
-        <Card className="border border-gray-300 shadow-sm py-1">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  System Limit
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {stats.limit.toLocaleString()}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">Maximum requests</p>
-              </div>
-              <div className="p-3 bg-gray-100 rounded-lg">
-                <Zap className="w-6 h-6 text-gray-600" />
               </div>
             </div>
           </CardContent>

@@ -27,7 +27,13 @@ export async function POST(req: NextRequest) {
   const { text, voice, temperature, model, styleInstructions } = body;
 
   // Split prompt into subclips to avoid gemini text limit
-  const subclips = splitPrompt(text, 1000);
+  let subclips = [];
+
+  if (model === "gemini-2.5-pro-preview-tts") {
+    subclips = splitPrompt(text, 500);
+  } else {
+    subclips = splitPrompt(text, 1000);
+  }
   console.log("Total subclips: ", subclips.length);
 
   try {
@@ -108,7 +114,7 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.log("Error generating audio: ", err.message);
     const parsedError = parseError(err);
-    await logError(parsedError, `API Error - Generate Audio`);
+    await logError(err, `API Error - Generate Audio`);
     return NextResponse.json({ error: parsedError.message }, { status: 500 });
   }
 }
